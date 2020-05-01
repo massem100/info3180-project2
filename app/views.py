@@ -12,7 +12,50 @@ from werkzeug.utils import secure_filename
 ###
 # Routing for your application.
 ###
+@app.route('/api/users/{user_id}/posts', methods = ['POST'])
+def addposts():
 
+    return 'add posts'
+
+
+@app.route('/api/users/{user_id}/posts', methods=['GET'])
+def getposts():
+
+    return 'To get posts'
+
+
+@app.route('//api/users/{user_id}/follow',  methods=['POST'])
+def follow():
+    
+    return 'follow'
+
+@app.route('/api/posts', methods = ['POST'])
+def posts():
+
+    return 'all posts'
+
+
+@app.route('/api/posts/{post_id}/like', methods = ['POST'])
+def likes(): 
+    return 'likes'
+
+    
+@app.route('/api/users/register', methods = ['POST'])
+def register():
+
+    return 'register'
+
+
+@app.route('/api/auth/login', methods = ['POST'])
+def login(): 
+
+    return 'login'
+
+
+@app.route('/api/auth/logout', methods = ['GET'])
+def logout():
+    
+    return 'logout'
 
 
 # Please create all new routes and view functions above this route.
