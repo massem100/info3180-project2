@@ -7,7 +7,6 @@ This file creates your application.
 import os
 from app import app
 from flask import render_template, request, jsonify
-# from app.forms import UploadForm
 from werkzeug.utils import secure_filename
 
 ###
@@ -29,7 +28,7 @@ def index(path):
 
     Also we will render the initial webpage and then let VueJS take control.
     """
-    return render_template('base.html')
+    return render_template('index.html')
 
 
 # Here we define a function to collect form errors from Flask-WTF
