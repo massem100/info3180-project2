@@ -220,14 +220,23 @@ const Login = Vue.component('login', {
             </div>
         </div> 
         </div>
-
-    
-    
-    
     
     `
 });
 
+const Logout = Vue.component('logout', {
+    template: 
+    `
+    <div class = "m-5 text-center"> 
+        <h1> 
+        You have been logged out
+        </h1>
+    </div> 
+
+
+    `
+
+});
 // Define Routes
 const router = new VueRouter({
     mode: 'history',
@@ -238,7 +247,7 @@ const router = new VueRouter({
 
         { path: "/login", component: Login },
 
-        // { path: "/logout", component: Logout },
+        { path: "/logout", component: Logout },
 
         // { path: "/explore", component: Explore},
 

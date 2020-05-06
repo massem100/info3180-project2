@@ -1,9 +1,10 @@
 from . import db
 from werkzeug.security import generate_password_hash
 from flask_login._compat import unicode
+from flask_login import UserMixin
 from datetime import date
 
-class UserProfile(db.Model):
+class User(UserMixin, db.Model):
     # You can use this to change the table name. The default convention is to use
     # the class name. In this case a class name of UserProfile would create a
     # user_profile (singular) table, but if we specify __tablename__ we can change it
@@ -11,43 +12,37 @@ class UserProfile(db.Model):
     __tablename__ = 'user_profiles'
 
     id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(80))
-    last_name = db.Column(db.String(80))
     username = db.Column(db.String(80), unique=True)
     password = db.Column(db.String(255))
+    first_name = db.Column(db.String(80))
+    last_name = db.Column(db.String(80))
+    email = db.Column(db.String(100))
+    location = db.Column(db.String(80))
+    bio = db.Column(db.String(250))
+    photo = db.Column(db.String(200))
+    joined_on = db.Column(db.Date())
 
-    def __init__(self, first_name, last_name, username, password):
+    def __init__(self, username, password, first_name, last_name, email,location, bio, photo):
         self.first_name = first_name
         self.last_name = last_name
         self.username = username
-        self.password = generate_password_hash(
-            password, method='pbkdf2:sha256')
+        self.password = generate_password_hash(password, method='pbkdf2:sha256')
+        self.location = location 
+        self.bio = bio
+        self.photo = photo 
+        self.joined_on = date.today()
 
-    def is_authenticated(self):
-        return True
-
-    def is_active(self):
-        return True
-
-    def is_anonymous(self):
-        return False
-
-    def get_id(self):
-        try:
-            return unicode(self.id)  # python 2 support
-        except NameError:
-            return str(self.id)  # python 3 support
-
+    
     def __repr__(self):
         return '<User %r>' % (self.username)
 
 
-class UserProfile(db.Model):
+class Post(UserMixin, db.Model):
     # You can use this to change the table name. The default convention is to use
     # the class name. In this case a class name of UserProfile would create a
     # user_profile (singular) table, but if we specify __tablename__ we can change it
     # to `user_profiles` (plural) or some other name.
-    __tablename__ = 'posts'
+    __tablename__ = 'user_posts'
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.String(15))
@@ -61,20 +56,31 @@ class UserProfile(db.Model):
        self.caption = caption 
        self.created_on = date.today()
 
-    def is_authenticated(self):
-        return True
+    
+    # def __repr__(self):
+    #     return '<User %r>' % (self.username)
 
-    def is_active(self):
-        return True
+class Likes(UserMixin, db.Model):
 
-    def is_anonymous(self):
-        return False
+    __tablename__ = 'post_likes'
 
-    def get_id(self):
-        try:
-            return unicode(self.id)  # python 2 support
-        except NameError:
-            return str(self.id)  # python 3 support
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String(15))
+    post_id = (db.Column(db.Integer))
 
-    def __repr__(self):
-        return '<User %r>' % (self.username)
+
+    def __init__(self, user_id, post_id):
+       self.user_id = user_id
+       self.post_id = post_id
+
+class Follows(UserMixin,db.Model):
+
+    __tablename__= 'user_follows'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String(15))
+    follower_id = (db.Column(db.Integer))
+
+    def __init__(self, user_id,follower_id):
+       self.user_id = user_id
+       self.follower_id = follower_id

@@ -8,6 +8,7 @@ import os
 from app import app
 from flask import render_template, request, jsonify
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash, check_password_hash
 
 ###
 # Routing for your application.
