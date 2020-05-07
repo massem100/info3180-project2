@@ -25,7 +25,7 @@ def getposts():
     return 'To get posts'
 
 
-@app.route('//api/users/{user_id}/follow',  methods=['POST'])
+@app.route('/api/users/{user_id}/follow',  methods=['POST'])
 def follow():
     
     return 'follow'
