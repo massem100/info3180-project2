@@ -4,30 +4,31 @@ Jinja2 Documentation:    http://jinja.pocoo.org/2/documentation/
 Werkzeug Documentation:  http://werkzeug.pocoo.org/documentation/
 This file creates your application.
 """
-
 import os
-from app import app, db, login_manager
-from app.models import User
+from app import app
 from flask import render_template, request, jsonify
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash, check_password_hash
+from app.forms import RegisterForm
+from app.models import User, Post
 
 ###
 # Routing for your application.
 ###
-
-# @app.route('/api/users/{user_id}/posts', methods = ['POST'])
-# def addposts():
-
-#     return 'add posts'
-
-
-# @app.route('/api/users/{user_id}/posts', methods=['GET'])
-# def getposts():
-
-#     return 'To get posts'
+@app.route('/api/users/<user_id>/posts', methods = ['POST'])
+def addposts():
+    posts = (db.session.query(Post).filter_by(current_user.user_id=user_id).all())
+    return jsonify(message = [{"post ID" : posts.id, "photo" : posts.photo, "caption" : posts.caption, "created on" : posts.created_on}])
+        
 
 
-@app.route('//api/users/{user_id}/follow',  methods=['POST'])
+@app.route('/api/users/{user_id}/posts', methods=['GET'])
+def getposts():
+
+    return 'To get posts'
+
+
+@app.route('/api/users/{user_id}/follow',  methods=['POST'])
 def follow():
     
     return 'follow'
@@ -45,8 +46,38 @@ def likes():
     
 @app.route('/api/users/register', methods = ['POST'])
 def register():
+    form = RegisterForm()
+    if request.method == "POST" and form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+        first_name = form.first_name.data
+        last_name = form.last_name.data
+        email = form.email.data
+        location = form.location.data
+        biography = form.biography.data
+        photo = form.photo.data
 
-    return 'register'
+        filename = secure_filename(photo.filename)
+        photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+
+        # Checks if another user has this username 
+        existing_username = db.session.query(User).filter_by(username=username).first()
+
+        # Checks if another user has this email address
+        existing_email = db.session.query(User).filter_by(email=email).first()
+
+        # If unique email address and username provided then log new user
+        if existing_username is None and existing_email is None:
+            user = User(username=request.form['username'], password=request.form['password'], first_name=request.form['first_name'], last_name=request.form['last_name'], email=request.form['email'], location=request.form['location'], biography=request.form['biography'])
+
+            db.session.add(user)
+            db.session.commit()
+            flash('Successfully registered', 'success')
+            
+            return jsonify(message = [{"username" : username, "password" : password, "first_name" : first_name, "last_name" : last_name, "email" : email, "location" : location, "biography" : biography}])
+        
+    # return render_template("register.html")
 
 
 @app.route('/api/auth/login', methods = ['POST'])
@@ -61,14 +92,9 @@ def logout():
     return 'logout'
 
 
-@login_manager.user_loader
-def load_user(id):
-    return User.query.get(int(id))
-
 # Please create all new routes and view functions above this route.
 # This route is now our catch all route for our VueJS single page
 # application.
-
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def index(path):
