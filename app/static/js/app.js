@@ -237,6 +237,7 @@ const Logout = Vue.component('logout', {
     `
 
 });
+
 // Define Routes
 const router = new VueRouter({
     mode: 'history',

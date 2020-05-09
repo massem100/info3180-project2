@@ -9,7 +9,7 @@ class User(UserMixin, db.Model):
     # the class name. In this case a class name of UserProfile would create a
     # user_profile (singular) table, but if we specify __tablename__ we can change it
     # to `user_profiles` (plural) or some other name.
-    __tablename__ = 'Users'
+    __tablename__ = 'User'
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True)
@@ -45,7 +45,7 @@ class Post(UserMixin, db.Model):
     __tablename__ = 'Posts'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.String(15), db.ForeignKey('Users.user_id'))
+    user_id = db.Column(db.String(15), db.ForeignKey('User.user_id'))
     photo = db.Column(db.String(80))
     caption = db.Column(db.String(250))
     created_on = db.Column(db.date())
@@ -65,8 +65,8 @@ class Likes(UserMixin, db.Model):
     __tablename__ = 'Likes'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.String(15), db.ForeignKey('Users.user_id'))
-    post_id = (db.Column(db.Integer, db.ForeignKey('Posts.user_id'))
+    user_id = db.Column(db.String(15), db.ForeignKey('User.user_id'))
+    post_id = db.Column(db.Integer, db.ForeignKey('Posts.user_id'))
 
 
     def __init__(self, user_id, post_id):
@@ -78,7 +78,7 @@ class Follows(UserMixin,db.Model):
     __tablename__= 'Follows'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.String(15), db.ForeignKey('Users.user_id'))
+    user_id = db.Column(db.String(15), db.ForeignKey('User.user_id'))
     follower_id = (db.Column(db.Integer))
 
     def __init__(self, user_id,follower_id):

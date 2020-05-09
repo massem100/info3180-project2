@@ -37,7 +37,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Program Files\heroku\flasky\info3180-project2\venv"
+VIRTUAL_ENV="C:\Users\Masse\Desktop\F\info3180-project2\venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
