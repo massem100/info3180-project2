@@ -37,6 +37,7 @@ Vue.component('app-footer', {
     `
 });
 
+
 const Home = Vue.component('home', {
     template: `
     <div class ="d-flex align-content-center t m-4 "> 
@@ -228,7 +229,6 @@ const Login = Vue.component('login', {
     `
 });
 
-<<<<<<< HEAD
 const Logout = Vue.component('logout', {
     template: 
     `
@@ -243,8 +243,6 @@ const Logout = Vue.component('logout', {
 
 });
 
-=======
->>>>>>> parent of cec8c8c... Started database
 // Define Routes
 const router = new VueRouter({
     mode: 'history',

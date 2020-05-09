@@ -18,3 +18,4 @@ UPLOAD_FOLDER = './app/static/uploads'
 # login_manager.login_view = 'login'
 
 app.config.from_object(__name__)
+from app import views
