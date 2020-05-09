@@ -5,10 +5,11 @@ Werkzeug Documentation:  http://werkzeug.pocoo.org/documentation/
 This file creates your application.
 """
 import os
-from app import app
-from flask import render_template, request, jsonify
+from app import app, db, login_manager
+from flask import render_template, request, jsonify, flash, session
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import current_user, logout_user, login_user
 from app.forms import RegisterForm
 from app.models import User, Post
 
@@ -16,8 +17,8 @@ from app.models import User, Post
 # Routing for your application.
 ###
 @app.route('/api/users/<user_id>/posts', methods = ['POST'])
-def addposts():
-    posts = (db.session.query(Post).filter_by(current_user.user_id=user_id).all())
+def addposts(user_id):
+    posts = (db.session.query(Post).filter_by(current_user.id==user_id).all())
     return jsonify(message = [{"post ID" : posts.id, "photo" : posts.photo, "caption" : posts.caption, "created on" : posts.created_on}])
         
 
@@ -69,7 +70,16 @@ def register():
 
         # If unique email address and username provided then log new user
         if existing_username is None and existing_email is None:
-            user = User(username=request.form['username'], password=request.form['password'], first_name=request.form['first_name'], last_name=request.form['last_name'], email=request.form['email'], location=request.form['location'], biography=request.form['biography'])
+            # user = User(username=request.form['username'], 
+            #         password=request.form['password'], 
+            #         first_name=request.form['first_name'],
+            #          last_name=request.form['last_name'], 
+            #          email=request.form['email'], 
+            #          location=request.form['location'],
+            #           biography=request.form['biography'])
+            
+            user = User(username="{}", password= "{}",first_name= "{}", last_name="{}",email="{}",location={},biography="{}",proPhoto = "{}").format(username, 
+            password,first_name, last_name, email, location, biography, photo)
 
             db.session.add(user)
             db.session.commit()
@@ -91,7 +101,13 @@ def logout():
     
     return 'logout'
 
-
+@login_manager.user_loader
+def load_user(id):
+    user = User.query.get(id)
+    if user == []: 
+        return 'x'
+    else: 
+        return user
 # Please create all new routes and view functions above this route.
 # This route is now our catch all route for our VueJS single page
 # application.
