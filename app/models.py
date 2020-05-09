@@ -1,10 +1,9 @@
 from . import db
 from werkzeug.security import generate_password_hash
 from flask_login._compat import unicode
-from flask_login import UserMixin
 from datetime import date
 
-class User(UserMixin, db.Model):
+class UserProfile(db.Model):
     # You can use this to change the table name. The default convention is to use
     # the class name. In this case a class name of UserProfile would create a
     # user_profile (singular) table, but if we specify __tablename__ we can change it
@@ -12,8 +11,6 @@ class User(UserMixin, db.Model):
     __tablename__ = 'User'
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True)
-    password = db.Column(db.String(255))
     first_name = db.Column(db.String(80))
     last_name = db.Column(db.String(80))
     email = db.Column(db.String(100))
@@ -32,12 +29,11 @@ class User(UserMixin, db.Model):
         self.proPhoto = proPhoto 
         self.joined_on = date.today()
 
-    
     def __repr__(self):
         return '<User %r>' % (self.username)
 
 
-class Post(UserMixin, db.Model):
+class UserProfile(db.Model):
     # You can use this to change the table name. The default convention is to use
     # the class name. In this case a class name of UserProfile would create a
     # user_profile (singular) table, but if we specify __tablename__ we can change it
@@ -56,11 +52,8 @@ class Post(UserMixin, db.Model):
        self.caption = caption 
        self.created_on = date.today()
 
-    
-    # def __repr__(self):
-    #     return '<User %r>' % (self.username)
-
-class Likes(UserMixin, db.Model):
+    def is_authenticated(self):
+        return True
 
     __tablename__ = 'Likes'
 
@@ -68,6 +61,11 @@ class Likes(UserMixin, db.Model):
     user_id = db.Column(db.String(15), db.ForeignKey('User.user_id'))
     post_id = db.Column(db.Integer, db.ForeignKey('Posts.user_id'))
 
+    def get_id(self):
+        try:
+            return unicode(self.id)  # python 2 support
+        except NameError:
+            return str(self.id)  # python 3 support
 
     def __init__(self, user_id, post_id):
        self.user_id = user_id

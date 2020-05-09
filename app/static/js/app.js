@@ -220,10 +220,15 @@ const Login = Vue.component('login', {
             </div>
         </div> 
         </div>
+
+    
+    
+    
     
     `
 });
 
+<<<<<<< HEAD
 const Logout = Vue.component('logout', {
     template: 
     `
@@ -238,6 +243,8 @@ const Logout = Vue.component('logout', {
 
 });
 
+=======
+>>>>>>> parent of cec8c8c... Started database
 // Define Routes
 const router = new VueRouter({
     mode: 'history',
@@ -248,7 +255,7 @@ const router = new VueRouter({
 
         { path: "/login", component: Login },
 
-        { path: "/logout", component: Logout },
+        // { path: "/logout", component: Logout },
 
         // { path: "/explore", component: Explore},
 
