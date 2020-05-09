@@ -20,9 +20,7 @@ class User(UserMixin, db.Model):
     bio = db.Column(db.String(250))
     proPhoto = db.Column(db.String(200))
     joined_on = db.Column(db.Date())
-    likes = db.relationship('Like', backref='User', lazy=True)
-    Post = db.relationship('Post', backref='User', lazy=True)
-    Follow = db.relationship('Follow', backref='User', lazy=True)
+    
 
     def __init__(self, username, password, first_name, last_name, email,location, bio, proPhoto):
         self.first_name = first_name
@@ -43,13 +41,14 @@ class Post(UserMixin,db.Model):
     # the class name. In this case a class name of UserProfile would create a
     # user_profile (singular) table, but if we specify __tablename__ we can change it
     # to `user_profiles` (plural) or some other name.
-    __tablename__ = 'Posts'
+    __tablename__ = 'Post'
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('User.id'))
     photo = db.Column(db.String(80))
     caption = db.Column(db.String(250))
     created_on = db.Column(db.Date())
+    
 
     def __init__(self, user_id, photo, caption, created_on):
        self.user_id = user_id
