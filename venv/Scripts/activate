@@ -37,7 +37,11 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
+<<<<<<< HEAD
 VIRTUAL_ENV="C:\Users\Masse\OneDrive\Documents\GitHub\info3180-project2\venv"
+=======
+VIRTUAL_ENV="C:\Users\Masse\Desktop\F\info3180-project2\venv"
+>>>>>>> parent of d6d47c6... ForeignKeyAdded
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

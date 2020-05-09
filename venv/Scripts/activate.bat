@@ -8,7 +8,11 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
+<<<<<<< HEAD
 set VIRTUAL_ENV=C:\Users\Masse\OneDrive\Documents\GitHub\info3180-project2\venv
+=======
+set VIRTUAL_ENV=C:\Users\Masse\Desktop\F\info3180-project2\venv
+>>>>>>> parent of d6d47c6... ForeignKeyAdded
 
 if not defined PROMPT set PROMPT=$P$G
 
