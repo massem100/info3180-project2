@@ -48,7 +48,7 @@ const Home = Vue.component('home', {
             
                 <div class = "card  col-md-5 " > 
                         <div class = "mb-5">
-                            <i class = "fas fa camera" > </i> <h3 class = "text-center mt-2"> Photogram</h3>
+                            <i class = "fas fa camera" > </i> <h3 class = "text-center mt-2 cursive">  <img src = "../static/images/camera.png" width = "20" height = "24" class = "pb-1 mr-2"> Photogram</h3>
                             <hr>
                             
                             <p class = ""> Share photos of your favourite moments with friends, family and the world. </p>
