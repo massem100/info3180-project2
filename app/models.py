@@ -2,7 +2,7 @@ from . import db
 from werkzeug.security import generate_password_hash
 from datetime import date
 from flask_login._compat import unicode
-from datetime import date
+from datetime import datetime
 from flask_login import UserMixin
 
 class User(UserMixin, db.Model):
@@ -19,7 +19,7 @@ class User(UserMixin, db.Model):
     location = db.Column(db.String(80))
     bio = db.Column(db.String(250))
     proPhoto = db.Column(db.String(200))
-    joined_on = db.Column(db.Date())
+    joined_on = db.Column(db.DateTime())
     
 
     def __init__(self, username, password, first_name, last_name, email,location, bio, proPhoto):
@@ -30,7 +30,7 @@ class User(UserMixin, db.Model):
         self.location = location 
         self.bio = bio
         self.proPhoto = proPhoto 
-        self.joined_on = date.today()
+        self.joined_on = datetime.now()
 
     def __repr__(self):
         return '<User %r>' % (self.username)
@@ -47,14 +47,14 @@ class Post(UserMixin,db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('User.id'))
     photo = db.Column(db.String(80))
     caption = db.Column(db.String(250))
-    created_on = db.Column(db.Date())
+    created_on = db.Column(db.DateTime())
     
 
-    def __init__(self, user_id, photo, caption, created_on):
+    def __init__(self, user_id, photo, caption):
        self.user_id = user_id
        self.photo = photo
        self.caption = caption 
-       self.created_on = date.today()
+       self.created_on = datetime.now()
 
     def is_authenticated(self):
         return True
