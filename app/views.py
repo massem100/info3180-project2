@@ -183,13 +183,34 @@ def register():
 @app.route('/api/auth/login', methods = ['POST'])
 def login(): 
 
-    return 'login'
+    form = LoginForm()
+    if request.method == "POST" and form.validate_on_submit():
+        if form.username.data:
+            # Get the username and password values from the form.
+            username = form.username.data
+            password = form.password.data
+
+            user = User.query.filter_by(username=username).first()
+
+            if user is not None and check_password_hash(user.password, password):
+                
+                # get user id, load into session
+                login_user(user)
+
+                # remember to flash a message to the user
+                flash('You have been logged in successfully.', 'success')
+                return jsonify(message = [{"username": username, "password": password}]) 
+
+            else:
+                flash('Invalid username or password', 'danger')
+    flash('Invalid username or password', 'danger')
 
 
 @app.route('/api/auth/logout', methods = ['GET'])
+@login_required
 def logout():
-    
-    return 'logout'
+    logout_user()
+    flash('Unfortunately, you have been logged out.', 'danger')
 
 @login_manager.user_loader
 def load_user(id):
