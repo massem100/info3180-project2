@@ -13,10 +13,11 @@ class User(UserMixin, db.Model):
     __tablename__ = 'User'
 
     id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(80))
-    last_name = db.Column(db.String(80))
-    username = db.Column(db.String(80))
-    email = db.Column(db.String(100))
+    first_name = db.Column(db.String(80), nullable=False)
+    last_name = db.Column(db.String(80), nullable=False)
+    username = db.Column(db.String(80), unique =True)
+    password = db.Column(db.String(200), nullable =False)
+    email = db.Column(db.String(100), nullable=False)
     location = db.Column(db.String(80))
     bio = db.Column(db.String(250))
     proPhoto = db.Column(db.String(200))
@@ -28,6 +29,7 @@ class User(UserMixin, db.Model):
         self.last_name = last_name
         self.username = username
         self.password = generate_password_hash(password, method='pbkdf2:sha256')
+        self.email = email
         self.location = location 
         self.bio = bio
         self.proPhoto = proPhoto 
