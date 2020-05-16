@@ -75,52 +75,55 @@ const Explore = Vue.component("explore", {
   template: `
       <div>
           
-          <div  class="card-group explore-card-group" >
-              <div class="card explore-card"  >
-                  <div class="card-header explore-card-header">
-  
-                      <!--place user profile image here-->
-  
-                      <div class="explore-card-pi">
-                          <img src="/static/uploads/bridge.jpg" class="card-img-top" alt="..." width="30" height="30">
-                      </div>
-  
-                      <!-place username here-->
-                      <p class="explore-card-username"><strong>username</strong></p>
+          <div class="card explore-card mb-3 explore-card-group" v-for= "post in posts" >
+              <div class="card-header explore-card-header">
+
+                  <!--place user profile image here-->
+
+                  <div class="explore-card-pi">
+                      <img src="/static/uploads/bridge.jpg" class="card-img-top" alt="..." width="30" height="30">
                   </div>
-                  <img src="/static/uploads/bridge.jpg" class="card-img-top explore-card-postimg" alt="..." >
-  
-                  <div class="card-body">
-                      <p class="card-text">
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut 
-                      labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris 
-                      nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit 
-                      esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in 
-                      culpa qui officia deserunt mollit anim id est laborum.
-                      </p>
+
+                  <!-place username here-->
+                  <p class="explore-card-username" ><a href="#" ><strong>{{username}}</strong></a></p>
+              </div>
+              <img src="/static/uploads/bridge.jpg" class="card-img-top explore-card-postimg" alt="..." >
+
+              <div class="card-body">
+                  <p class="card-text">
+                  {{post}}
+                  {{body}}
+                  </p>
+              </div>
+
+              <div class="card-footer" style="background-color: white;">
+                  <div class="float-left">
+                  <p> <i class = "fas fa camera" ></i><strong>10 likes</strong></p> 
                   </div>
-  
-                  <div class="card-footer" style="background-color: white;">
-                      <div class="float-left">
-                      <p> <i class = "fas fa camera" ></i><strong>10 likes</strong></p> 
-                      </div>
-  
-                      <!--place date here-->
-  
-                      <div class="float-right">
-                      <p><strong>24 April 2018</strong></p>
-                      </div>
+
+                  <!--place date here-->
+
+                  <div class="float-right">
+                  <p><strong>{{created_on}}</strong></p>
                   </div>
               </div>
-              
-              
           </div>
-          <div class="float-right explore-npost-btn" >
-              <button class = "btn btn-primary " > New Post </button> 
-          </div> 
+      
   
     </div>
     `,
+  data: function () {
+    return {
+      username: "username",
+      body: `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut 
+        labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris 
+        nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit 
+        esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in 
+        culpa qui officia deserunt mollit anim id est laborum.`,
+      created_on: "April 24, 2018",
+      posts: ["post1", "post2", "post3"],
+    };
+  },
 });
 
 const NotFound = Vue.component("not-found", {
