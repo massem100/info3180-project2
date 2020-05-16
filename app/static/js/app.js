@@ -2,7 +2,7 @@
 Vue.component('app-header', {
     template: `
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
-      <a class="navbar-brand cursive" href="#"><i class="fas fa-camera"> <img src = "../static/images/camera.png" width = "20" height = "24" class = "pb-1 mr-2"> </i> Photogram </a>
+      <a class="navbar-brand cursive" href="#"><i class="fas fa-camera"> <img src = "../static/uploads/camera.png" width = "20" height = "24" class = "pb-1 mr-2"> </i> Photogram </a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -157,7 +157,7 @@ const Register = Vue.component('register', {
                             <input type="file" class="custom-file-input"  name = "photo" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
                             <label class="custom-file-label" for="inputGroupFile01">Choose Files</label>
                         </div>
-                        </div>
+                        </div>0
                     </div>
                     <div class=" d-flex justify-content-center p-2">
                         <div class="col-xs-12">
@@ -316,7 +316,7 @@ const UserProfile = Vue.component('profile', {
                 <div class = "row">
                     <div class = "col-9 row">
                         <div class = "col-3 pr-3">
-                            <img src="/static/images/propic.png" alt="icon" height="180" width="200" class = "mb-3"> 
+                            <img src="/static/uploads/propic.png" alt="icon" height="180" width="200" class = "mb-3"> 
                         </div>
 
                         <div class = "col-8 pl-3 mt-3">
@@ -374,15 +374,15 @@ const UserProfile = Vue.component('profile', {
 
             <div class = "row">
                 <div class = "col-4">
-                    <img src="/static/images/bridge.jpg" height="350" width="350" class = ""> 
+                    <img src="/static/uploasa/bridge.jpg" height="350" width="350" class = ""> 
                 </div>
 
                 <div class = "col-4">
-                    <img src="/static/images/bridge.jpg" height="350" width="350" class = "">
+                    <img src="/static/uploads/bridge.jpg" height="350" width="350" class = "">
                 </div>
 
                 <div class = "col-4">
-                    <img src="/static/images/bridge.jpg" height="350" width="350" class = "">
+                    <img src="/static/uploads/bridge.jpg" height="350" width="350" class = "">
                 </div>
 
 

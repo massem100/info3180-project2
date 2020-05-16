@@ -1,14 +1,8 @@
 """empty message
 
-<<<<<<< HEAD:migrations/versions/cd8e7cc84fe0_.py
 Revision ID: cd8e7cc84fe0
 Revises: 
 Create Date: 2020-05-16 09:10:56.556190
-=======
-Revision ID: 16542549d994
-Revises: 
-Create Date: 2020-05-11 22:29:52.173821
->>>>>>> bf47d7d176457436215df93d011b36b7d5b47668:migrations/versions/16542549d994_.py
 
 """
 from alembic import op
@@ -16,11 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-<<<<<<< HEAD:migrations/versions/cd8e7cc84fe0_.py
 revision = 'cd8e7cc84fe0'
-=======
-revision = '16542549d994'
->>>>>>> bf47d7d176457436215df93d011b36b7d5b47668:migrations/versions/16542549d994_.py
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -39,12 +29,8 @@ def upgrade():
     sa.Column('bio', sa.String(length=250), nullable=True),
     sa.Column('proPhoto', sa.String(length=200), nullable=True),
     sa.Column('joined_on', sa.DateTime(), nullable=True),
-<<<<<<< HEAD:migrations/versions/cd8e7cc84fe0_.py
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('username')
-=======
-    sa.PrimaryKeyConstraint('id')
->>>>>>> bf47d7d176457436215df93d011b36b7d5b47668:migrations/versions/16542549d994_.py
     )
     op.create_table('Follow',
     sa.Column('id', sa.Integer(), nullable=False),
