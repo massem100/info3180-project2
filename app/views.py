@@ -24,8 +24,9 @@ from datetime import datetime
 #                                  "photo" : posts.photo,
 #                                  "caption" : posts.caption,
 #                                   "created on" : posts.created_on}])
+            
         
-
+  
 
 @app.route('/api/users/{user_id}/posts', methods=['GET', 'POST'])
 def userposts(user_id):
@@ -135,7 +136,7 @@ def likes(post_id):
         return jsonify(error=[{'error': 'Connection not achieved'}])
 
     
-@app.route('/api/users/register', methods = ['POST'])
+@app.route('/api/users/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
     if request.method == "POST" and form.validate_on_submit():

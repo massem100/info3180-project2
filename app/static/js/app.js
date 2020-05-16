@@ -2,7 +2,7 @@
 Vue.component('app-header', {
     template: `
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
-      <a class="navbar-brand " href="#"><i class="fas fa-camera"> </i> Photogram </a>
+      <a class="navbar-brand cursive" href="#"><i class="fas fa-camera"> <img src = "../static/images/camera.png" width = "20" height = "24" class = "pb-1 mr-2"> </i> Photogram </a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -16,7 +16,7 @@ Vue.component('app-header', {
             <router-link class="nav-link" to="/explore">Explore<span class="sr-only">(current)</span></router-link>
           </li>
           <li class="nav-item active">
-            <router-link class="nav-link" to="/profile"> MyProfile <span class="sr-only">(current)</span></router-link>
+            <router-link class="nav-link" to="/users"> My Profile <span class="sr-only">(current)</span></router-link>
           </li>
           <li class="nav-item active">
             <router-link class="nav-link" to="/logout">Logout<span class="sr-only">(current)</span></router-link>
@@ -213,7 +213,7 @@ const Login = Vue.component('login', {
                         <div class="col-xs-12">
                             <br>
                             <button class="btn btn-lg btn-success" type="submit"><i
-                                    class="glyphicon glyphicon-ok-sign"></i> Register </button>
+                                    class="glyphicon glyphicon-ok-sign"></i> Login </button>
                             
                         </div>
                     </div>
@@ -243,6 +243,104 @@ const Logout = Vue.component('logout', {
 
 });
 
+
+
+const UserProfile = Vue.component('profile', {
+    template: `
+        <div>
+            <div class = "shadow p-3 mb-5 bg-white rounded">
+                <div class = "row">
+                    <div class = "col-9 row">
+                        <div class = "col-3 pr-3">
+                            <img src="/static/images/propic.png" alt="icon" height="180" width="200" class = "mb-3"> 
+                        </div>
+
+                        <div class = "col-8 pl-3 mt-3">
+                            <div class = "user-name">
+                                {{username}}
+                            </div>
+
+                            <div class = "location mt-3">
+                                {{location}}
+                            </div>
+
+                            <div class = "membership">
+                                Member since {{membership}}
+                            </div>
+
+                            <div class = "user-bio mt-3 mb-2">
+                                {{biography}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class = "col-3 mt-3 row center">
+                        <div class = "col-6"> 
+                            <div class = "post-follow-num">
+                                {{postNum}}
+                            </div>
+                            <div class = "post-follow-label">
+                                Posts
+                            </div>
+                        </div>
+
+
+                        <div class = "col-6">
+                            <div class = "post-follow-num">
+                                {{follNum}}
+                            </div>
+                            <div class = "post-follow-label">
+                                Followers
+                            </div>
+                        </div>
+
+                        <div class = "wt-lrg">
+                            <button class="btn btn-primary ml-2 btn-width">
+                                Follow
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+
+            </div>
+
+            <div class = "row">
+                <div class = "col-4">
+                    <img src="/static/images/bridge.jpg" height="350" width="350" class = ""> 
+                </div>
+
+                <div class = "col-4">
+                    <img src="/static/images/bridge.jpg" height="350" width="350" class = "">
+                </div>
+
+                <div class = "col-4">
+                    <img src="/static/images/bridge.jpg" height="350" width="350" class = "">
+                </div>
+
+
+            </div>
+    
+       
+        </div>
+    ` ,
+    data: function(){
+        return {
+            username: 'Jane Doe',
+            location: 'Kingston, Ja',
+            membership: 'Jan 2020',
+            biography: 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
+            postNum: '93',
+            follNum: '239',
+            posts: []
+        }
+    }
+});
+
+
 // Define Routes
 const router = new VueRouter({
     mode: 'history',
@@ -257,7 +355,8 @@ const router = new VueRouter({
 
         // { path: "/explore", component: Explore},
 
-        // { path: "/users/{user_id}", component: UserPosts },
+        { path: "/users/{user_id}", component: UserProfile },
+        
 
         // { path: "/posts/new", component: NewPost},
 

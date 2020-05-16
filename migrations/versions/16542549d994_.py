@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 80e7edc14ef3
+Revision ID: 16542549d994
 Revises: 
-Create Date: 2020-05-09 14:47:58.281764
+Create Date: 2020-05-11 22:29:52.173821
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '80e7edc14ef3'
+revision = '16542549d994'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -26,7 +26,7 @@ def upgrade():
     sa.Column('location', sa.String(length=80), nullable=True),
     sa.Column('bio', sa.String(length=250), nullable=True),
     sa.Column('proPhoto', sa.String(length=200), nullable=True),
-    sa.Column('joined_on', sa.Date(), nullable=True),
+    sa.Column('joined_on', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('Follow',
@@ -42,7 +42,7 @@ def upgrade():
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('photo', sa.String(length=80), nullable=True),
     sa.Column('caption', sa.String(length=250), nullable=True),
-    sa.Column('created_on', sa.Date(), nullable=True),
+    sa.Column('created_on', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['User.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
