@@ -1,76 +1,112 @@
-
-
 body {
-    padding-top: 5rem;
-    background-color: #efebff;
+  padding-top: 5rem;
+  background-color: #efebff;
 }
 
-.box-height{ 
-    height: 100px;
-
+.box-height {
+  height: 100px;
 }
 
-.home-image{
-    width: 100%;
-    height:100%;
-} 
-
-.cursive{
-    font-family: 'Oleo Script', cursive;
+.home-image {
+  width: 100%;
+  height: 100%;
 }
 
+.cursive {
+  font-family: "Oleo Script", cursive;
+}
 
 /******* PROFILE ************/
-.shadow{
-    -webkit-box-shadow: -4px 3px 6px 2px rgba(224,224,224,1);
-    -moz-box-shadow: -4px 3px 6px 2px rgba(224,224,224,1);
-    box-shadow: -4px 3px 6px 2px rgba(224,224,224,1);
+.shadow {
+  -webkit-box-shadow: -4px 3px 6px 2px rgba(224, 224, 224, 1);
+  -moz-box-shadow: -4px 3px 6px 2px rgba(224, 224, 224, 1);
+  box-shadow: -4px 3px 6px 2px rgba(224, 224, 224, 1);
 }
 
-.user-name{
-    color: #5b5d5e;
-    font-weight: bolder;
-    font-size: 20px;
+.user-name {
+  color: #5b5d5e;
+  font-weight: bolder;
+  font-size: 20px;
 }
 
-.location{
-    color: #9c9c9c;
-    font-weight: 500;
-    font-size: 15px;
+.location {
+  color: #9c9c9c;
+  font-weight: 500;
+  font-size: 15px;
 }
 
-.user-bio{
-    color: #9c9c9c;
-    font-weight: 500;
-    font-size: 15px;
+.user-bio {
+  color: #9c9c9c;
+  font-weight: 500;
+  font-size: 15px;
 }
 
-.membership{
-    color: #9c9c9c;
-    font-weight: 500;
-    font-size: 15px;
+.membership {
+  color: #9c9c9c;
+  font-weight: 500;
+  font-size: 15px;
 }
 
-.post-follow-num{
-    color: #5b5d5e;
-    font-weight: bolder;
-    font-size: 24px;
+.post-follow-num {
+  color: #5b5d5e;
+  font-weight: bolder;
+  font-size: 24px;
 }
 
-
-.center{
-    text-align: center;
+.center {
+  text-align: center;
 }
 
-.post-follow-label{
-    color: #9c9c9c;
-    font-weight: bolder;
+.post-follow-label {
+  color: #9c9c9c;
+  font-weight: bolder;
 }
 
-.wt-lrg{
-    width: 100%;
+.wt-lrg {
+  width: 100%;
 }
 
-.btn-width{
-    width: 70%;
+.btn-width {
+  width: 70%;
+}
+
+/******* EXPLORE PAGE ************/
+
+.explore-card-group {
+  max-width: 40rem;
+  float: left;
+}
+.explore-card {
+  margin-top: 40px;
+}
+
+.explore-card-header {
+  background-color: white;
+  height: 52px;
+}
+
+.explore-card-pi {
+  float: left;
+  width: 30px;
+  height: 30px;
+}
+
+.explore-card-username {
+  margin-left: 43px;
+}
+
+.explore-card-postimg {
+  height: 406px;
+}
+
+.explore-npost-btn {
+  margin-top: 40px;
+}
+
+.float-left {
+  float: left;
+}
+
+.float-right {
+  float: right;
 }
