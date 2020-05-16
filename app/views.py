@@ -9,7 +9,7 @@ from app import app, db, login_manager
 from flask import render_template, request, jsonify, flash, session
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import current_user, logout_user, login_user
+from flask_login import current_user, logout_user, login_user, login_required
 from app.forms import RegisterForm, PostForm, LoginForm
 from app.models import User, Post, Like, Follow
 from datetime import datetime
@@ -139,7 +139,9 @@ def likes(post_id):
 @app.route('/api/users/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
-    if request.method == "POST" and form.validate_on_submit():
+    if request.method == 'POST' and form.validate_on_submit():
+    
+        print('here')
         username = form.username.data
         password = form.password.data
         first_name = form.first_name.data
@@ -148,9 +150,10 @@ def register():
         location = form.location.data
         biography = form.biography.data
         photo = form.photo.data
-
-        filename = secure_filename(photo.filename)
-        photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        
+        photo_filename = secure_filename(photo.filename)
+        folder =app.config['UPLOAD_FOLDER']
+        photo.save(os.path.join(folder, photo_filename))
 
 
         # Checks if another user has this username 
@@ -161,44 +164,58 @@ def register():
 
         # If unique email address and username provided then log new user
         if existing_username is None and existing_email is None:
-            # user = User(username=request.form['username'], 
-            #         password=request.form['password'], 
-            #         first_name=request.form['first_name'],
-            #          last_name=request.form['last_name'], 
-            #          email=request.form['email'], 
-            #          location=request.form['location'],
-            #           biography=request.form['biography'])
-            
-            user = User(username="{}", password= "{}",first_name= "{}", last_name="{}",email="{}",location="{}",biography="{}",proPhoto = "{}").format(username, 
-            password,first_name, last_name, email, location, biography, photo)
+            user = User(username=username, 
+                    password=password,
+                    first_name=first_name,
+                    last_name=last_name, 
+                    email=email, 
+                    location=location,
+                    bio=biography,
+                    proPhoto=photo_filename)
 
             db.session.add(user)
             db.session.commit()
-            flash('Successfully registered', 'success')
-            
-            return jsonify(message = [{"username" : username, "password" : password, "first_name" : first_name, "last_name" : last_name, "email" : email, "location" : location, "biography" : biography}])
-        
-    # return render_template("register.html")
+                                    
+        return jsonify([{'message': 'Successfully registered'}])
+    else: 
+        error_list = form_errors(form)
+        error = [{'errors': error_list}]
+        return  jsonify(errors = error)
+
 
 
 @app.route('/api/auth/login', methods = ['POST'])
 def login(): 
+    form = LoginForm()
+    if request.method == "POST" and form.validate_on_submit() and form.username.data:
+            # Get the username and password values from the form.
+        username = form.username.data
+        password = form.password.data
 
-    return 'login'
+        user = User.query.filter_by(username=username).first()
+        if user is not None and check_password_hash(user.password, password):
+            # get user id, load into session
+            login_user(user)
+            # remember to flash a message to the user
+            # flash('You have been logged in successfully.', 'success')
+        return jsonify(message=[{"message": 'You have been logged in successfully.'}])
+    else:
+        error_list = form_errors(form)
+        return jsonify(errors=[{"error message": 'Invalid username or password', 'errors': error_list}])
+
 
 
 @app.route('/api/auth/logout', methods = ['GET'])
+@login_required
 def logout():
-    
-    return 'logout'
+    logout_user()
+    flash('Unfortunately, you have been logged out.', 'danger')
 
 @login_manager.user_loader
 def load_user(id):
     user = User.query.get(int(id))
-    if user == []: 
-        return 'x'
-    else: 
-        return user
+    return user
+
 # Please create all new routes and view functions above this route.
 # This route is now our catch all route for our VueJS single page
 # application.
@@ -213,6 +230,7 @@ def index(path):
     Also we will render the initial webpage and then let VueJS take control.
     """
     return render_template('index.html')
+
 
 
 # Here we define a function to collect form errors from Flask-WTF

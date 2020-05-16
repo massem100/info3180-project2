@@ -43,12 +43,12 @@ const Home = Vue.component('home', {
     <div class ="d-flex align-content-center t m-4 "> 
         <div class = "d-flex flex-row align-content-center  h-50"> 
             <div class = " m-2 w-50" > 
-                <img class = "home-image border border-secondary " src="/static/images/bridge.jpg"/>
+                <img class = "home-image border border-secondary " src="/static/uploads/bridge.jpg"/>
             </div>
             
                 <div class = "card  col-md-5 " > 
                         <div class = "mb-5">
-                            <i class = "fas fa camera" > </i> <h3 class = "text-center mt-2 cursive">  <img src = "../static/images/camera.png" width = "20" height = "24" class = "pb-1 mr-2"> Photogram</h3>
+                            <i class = "fas fa camera" > </i> <h3 class = "text-center mt-2 cursive">  <img src = "../static/uploads/camera.png" width = "20" height = "24" class = "pb-1 mr-2"> Photogram</h3>
                             <hr>
                             
                             <p class = ""> Share photos of your favourite moments with friends, family and the world. </p>
@@ -87,100 +87,128 @@ const Register = Vue.component('register', {
     template:
 
     `
-    <div>
     
-       <div class = "d-flex flex-column align-items-center m-2"> 
-            <h4 class = "d-flex justify-content-left font-weight-bold"> Register </h4>
-            <div class = "card w-50 d-flex m-2 border rounded">
-                <form class="form-group m-4 p-2" action="##" method="post" id="registrationForm" enctype = 'multipart/form-data'>
-                    <div class="form-group mt-3">
-                        <div class="col-xs-6">
-                            <label for="username">
-                                <h4>Username</h4>
-                            </label>
-                            <input type="text" class="form-control" name="username" id="username"
-                                placeholder="Enter a username" title="Enter a username">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-xs-6">
-                            <label for="password">
-                                <h4>Password</h4>
-                            </label>
-                            <input type="password" class="form-control" name="password" id="password"
-                                placeholder="password" title="enter your password.">
-                        </div>
-                    </div>         
-                    <div class="form-group">
-                        <div class="col-xs-6">
-                            <label for="first_name">
-                                <h4>First name</h4>
-                            </label>
-                            <input type="text" class="form-control" name="first_name" id="first_name"
-                                placeholder="first name" title="enter your first name if any.">
-                        </div>
-                    </div>
-                    <div class="form-group">
+            <div class = "card w-50 d-flex flex-column m-2 border rounded">
+                <div> 
+                        <ul v-for= "data in success" class="list alert alert-success"> 
+                                {{data.message}}
+                        
+                        </ul>
+                        
+                        <ul v-for = "error in errors" class="list alert alert-danger d-flex flex-column"> 
+                            <li class = "ml-3" > 
+                                {{error.errors[0]}} 
+                            </li>
+                                                        
+                            <li class = "ml-3">
+                                    {{error.errors[1]}}    
+                            
+                            </li>
 
-                        <div class="col-xs-6">
-                            <label for="last_name">
-                                <h4>Last name</h4>
-                            </label>
-                            <input type="text" class="form-control" name="last_name" id="last_name"
-                                placeholder="last name" title="enter your last name if any.">
-                        </div>
-                    </div>
-
-                   <div class="form-group">
-                        <div class="col-xs-6">
-                            <label for="email">
-                                <h4>Email</h4>
-                            </label>
-                            <input type="email" class="form-control" name="email" id="email"
-                                placeholder="you@email.com" title="enter your email.">
-                        </div>
-                    </div>
-                    <div class="form-group">
-
-                        <div class="col-xs-6">
-                            <label for="location">
-                                <h4>Location</h4>
-                            </label>
-                            <input type="text" class="form-control" id="location" placeholder="Where are you from?"
-                                title="enter a location">
-                        </div>
-                    </div>
-                    <div class="form-group">
-
-                        <div class="col-xs-6">
-                            <label for="biography">
-                                <h4>Biography</h4>
-                            </label>
-                            <textarea type="text" rows ="4" class="form-control" id="biography" placeholder="Enter a biography, Max Characters: 250"
-                                title="Enter a Biography"></textarea>
-                        </div>
-                    </div>
-                    <div class="form-group">
-
-                        <div class="col-xs-6 d-flex flex-column">
-                            <label for="photo"> <h4>Photo </h4> </label>
-                            <input type="file" class="" id="photo" placeholder="Browse">
-                        </div>
-                    </div>
+                        </ul> 
+                </div>
+                <form class="form-group m-4 p-2" @submit.prevent="registerInfo" method='POST' id="RegisterForm" enctype ="multipart/form-data">
+                   
                     
-                    <div class="form-group d-flex justify-content-center p-2">
+                        <div class="col-xs-6">
+                            <label for="username"> <h4> Username </h4> </label>
+                            <input type="text"  class = "form-control" name="username" id="username" placeholder="Enter a username">
+                        </div>
+                    
+                    
+                        <div class="col-xs-6">
+                            <label for="password"> <h4>Password</h4> </label>
+                            <input type="password" class = "form-control" name="password" id="password" placeholder="password" >
+                        </div>
+                    
+                        <div class="col-xs-6">
+                            <label for="first_name"> <h4> First name</h4> </label>
+                            <input type="text"   class = "form-control" name="first_name" id="first_name" placeholder="first name" >
+                        </div>
+                    
+
+                        <div class="col-xs-6">
+                            <label for="last_name"> <h4>Last name</h4> </label>
+                            <input type="text" class = "form-control" name="last_name" id="last_name"
+                                placeholder="last name" >
+                        </div>
+                   
+                        <div class="col-xs-6">
+                            <label for="email"> <h4>Email</h4>  </label>
+                            <input type="text" class = "form-control" name="email" id="email" placeholder="you@email.com" >
+                        </div>
+                         <div class="col-xs-6">
+                            <label for="location"> <h4>Location</h4>  </label>
+                            <input type="text"  class = "form-control"id="location" name = "location" placeholder="Where are you from?">
+                        </div>
+                   
+                        <div class="col-xs-6">
+                            <label for="biography"> <h4>Biography</h4></label>
+                            <textarea  rows ="4" class = "form-control" id="biography" name = "biography" placeholder="Enter a biography, Max Characters: 250"></textarea>
+                        </div>
+                        <div class = "mt-2 mb-2">
+                        <h4> Photo</h4> 
+                        <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
+                        </div>
+                        <div class="custom-file">
+                            
+                            <input type="file" class="custom-file-input"  name = "photo" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
+                            <label class="custom-file-label" for="inputGroupFile01">Choose Files</label>
+                        </div>
+                        </div>
+                    </div>
+                    <div class=" d-flex justify-content-center p-2">
                         <div class="col-xs-12">
                             <br>
-                            <button class="btn btn-lg btn-success" type="submit"><i
+                            <button class="btn btn-lg btn-success" type="submit" ><i
                                     class="glyphicon glyphicon-ok-sign"></i> Register </button>
                             
                         </div>
                     </div>
                 </form>
-            </div>
-        </div> 
+           
+        
         </div>
-        `
+        `,
+        data: function(){
+            return {
+                success: [], 
+                errors :[]
+
+            }
+        }, 
+    methods: {
+        registerInfo: function () {
+            
+            let self = this;
+            let registerForm = document.getElementById('RegisterForm');
+            let form_data = new FormData(registerForm);
+            fetch('/api/users/register', {
+                method: 'POST',
+                body: form_data,
+                headers: {
+                    "X-CSRFToken": token
+                },
+                credentials: "same-origin"
+
+            })
+                .then(function (response) {
+                    return response.json();
+                })
+                // .then((text)=> console.log(text))
+                .then( function(jsonResponse) {
+                    // display a success message
+                    console.log(jsonResponse);
+                    self.success= jsonResponse.success;
+                    self.errors = jsonResponse.errors;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
+    }
 });
 
 const Login = Vue.component('login', {
@@ -190,14 +218,13 @@ const Login = Vue.component('login', {
        <div class = "d-flex flex-column align-items-center m-2"> 
             <h4 class = "d-flex justify-content-left font-weight-bold"> Login</h4>
             <div class = "card w-50 d-flex m-2 border rounded">
-                <form class="form-group m-4 p-2" action="##" method="post" id="registrationForm" enctype = 'multipart/form-data'>
+                <form class="form-group m-4 p-2" method="post"  id= "LoginForm" enctype = 'multipart/form-data'>
                     <div class="form-group mt-3">
                         <div class="col-xs-6">
                             <label for="username">
                                 <h4>Username</h4>
                             </label>
-                            <input type="text" class="form-control" name="username" id="username"
-                                placeholder="Enter a username" title="Enter a username">
+                            <input type="text"  name="username" id="username" placeholder="Enter a username" >
                         </div>
                     </div>
                     <div class="form-group">
@@ -205,8 +232,8 @@ const Login = Vue.component('login', {
                             <label for="password">
                                 <h4>Password</h4>
                             </label>
-                            <input type="password" class="form-control" name="password" id="password"
-                                placeholder="password" title="enter your password.">
+                            <input type="password"  name="password" id="password"
+                                placeholder="password" >
                         </div>
                     </div>                             
                     <div class="form-group d-flex justify-content-center p-2">
@@ -226,7 +253,44 @@ const Login = Vue.component('login', {
     
     
     
-    `
+    `, 
+    data: function(){
+        return{ 
+            success: [], 
+            erros: []
+        }
+
+    }, 
+    methods: {
+        LoginUser: function () {
+
+            let self = this;
+            let loginForm = document.getElementById('LoginForm');
+            let form_data = new FormData(loginForm);
+            fetch('/api/auth/login', {
+                method: 'POST',
+                body: form_data,
+                headers: {
+                    "X-CSRFToken": token
+                },
+                credentials: "same-origin"
+
+            })
+                .then(function (response) {
+                    return response.json();
+                })
+                // .then((text)=> console.log(text))
+                .then(function (jsonResponse) {
+                    // display a success message
+                    console.log(jsonResponse);
+                    self.success = jsonResponse.success;
+                    self.errors = jsonResponse.errors;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
+    }
 });
 
 const Logout = Vue.component('logout', {

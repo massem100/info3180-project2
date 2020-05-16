@@ -7,13 +7,15 @@ from flask_wtf.csrf import CSRFProtect
 UPLOAD_FOLDER = './app/static/uploads'
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'v\xf9\xf7\x11\x13\x18\xfaMYp\xed_\xe8\xc9w\x06\x8e\xf0f\xd2\xba\xfd\x8c\xda'
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://proj2:pass@localhost/proj2" 
+app.config['SECRET_KEY'] = 'v\xf9\xf7\x11\x13\x18\xfaMYp\xed_\xe8\xc9w\x06\x8e\xf0f\xd2\xba\xfd\x8c\a'
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://project2:project2@localhost/project2" # added just to suppress a warnin
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+
 csrf = CSRFProtect(app)
 
+
 db = SQLAlchemy(app)
-UPLOAD_FOLDER = './app/static/uploads'
+
 
 # Flask_Login login manager
 login_manager = LoginManager()
