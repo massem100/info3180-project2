@@ -2,6 +2,7 @@
 
 body {
     padding-top: 5rem;
+    background-color: #efebff;
 }
 
 .box-height{ 
@@ -16,4 +17,60 @@ body {
 
 .cursive{
     font-family: 'Oleo Script', cursive;
+}
+
+
+/******* PROFILE ************/
+.shadow{
+    -webkit-box-shadow: -4px 3px 6px 2px rgba(224,224,224,1);
+    -moz-box-shadow: -4px 3px 6px 2px rgba(224,224,224,1);
+    box-shadow: -4px 3px 6px 2px rgba(224,224,224,1);
+}
+
+.user-name{
+    color: #5b5d5e;
+    font-weight: bolder;
+    font-size: 20px;
+}
+
+.location{
+    color: #9c9c9c;
+    font-weight: 500;
+    font-size: 15px;
+}
+
+.user-bio{
+    color: #9c9c9c;
+    font-weight: 500;
+    font-size: 15px;
+}
+
+.membership{
+    color: #9c9c9c;
+    font-weight: 500;
+    font-size: 15px;
+}
+
+.post-follow-num{
+    color: #5b5d5e;
+    font-weight: bolder;
+    font-size: 24px;
+}
+
+
+.center{
+    text-align: center;
+}
+
+.post-follow-label{
+    color: #9c9c9c;
+    font-weight: bolder;
+}
+
+.wt-lrg{
+    width: 100%;
+}
+
+.btn-width{
+    width: 70%;
 }
