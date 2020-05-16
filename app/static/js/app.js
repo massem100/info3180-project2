@@ -73,41 +73,51 @@ const Home = Vue.component("home", {
 
 const Explore = Vue.component("explore", {
   template: `
-      <div>
-          
-          <div class="card explore-card mb-3 explore-card-group" v-for= "post in posts" >
-              <div class="card-header explore-card-header">
+      <div class="container">
+          <div class="row explore-card">
+            <div class="col-md-9">
+              <div class="card explore-card-btm mb-3  explore-card-group" v-for= "post in posts" >
+                  <div class="card-header explore-card-header">
 
-                  <!--place user profile image here-->
+                      <!--place user profile image here-->
 
-                  <div class="explore-card-pi">
-                      <img src="/static/uploads/bridge.jpg" class="card-img-top" alt="..." width="30" height="30">
+                      <div class="explore-card-pi">
+                          <img src="/static/uploads/bridge.jpg" class="card-img-top" alt="..." width="30" height="30">
+                      </div>
+
+                      <!-place username here-->
+                      <p class="explore-card-username" ><a href="#" ><strong>{{username}}</strong></a></p>
+                  </div>
+                  <img src="/static/uploads/bridge.jpg" class="card-img-top explore-card-postimg" alt="..." >
+
+                  <div class="card-body">
+                      <p class="card-text">
+                      {{post}}
+                      {{body}}
+                      </p>
                   </div>
 
-                  <!-place username here-->
-                  <p class="explore-card-username" ><a href="#" ><strong>{{username}}</strong></a></p>
-              </div>
-              <img src="/static/uploads/bridge.jpg" class="card-img-top explore-card-postimg" alt="..." >
+                  <div class="card-footer" style="background-color: white;">
+                      <div class="float-left">
+                      <p> <i class = "fas fa camera" ></i><strong>10 likes</strong></p> 
+                      </div>
 
-              <div class="card-body">
-                  <p class="card-text">
-                  {{post}}
-                  {{body}}
-                  </p>
-              </div>
+                      <!--place date here-->
 
-              <div class="card-footer" style="background-color: white;">
-                  <div class="float-left">
-                  <p> <i class = "fas fa camera" ></i><strong>10 likes</strong></p> 
-                  </div>
-
-                  <!--place date here-->
-
-                  <div class="float-right">
-                  <p><strong>{{created_on}}</strong></p>
+                      <div class="float-right">
+                      <p><strong>{{created_on}}</strong></p>
+                      </div>
                   </div>
               </div>
+            </div>
+            <div class="col-md-3 float-right">
+            
+                <button class = "btn btn-primary m-3 p-2 w-100 text-white""> New Post </button> 
+       
+            </div>
+            
           </div>
+          
       
   
     </div>

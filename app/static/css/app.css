@@ -79,6 +79,10 @@ body {
   margin-top: 40px;
 }
 
+.explore-card-btm {
+  margin-bottom: 50px !important;
+}
+
 .explore-card-header {
   background-color: white;
   height: 52px;
