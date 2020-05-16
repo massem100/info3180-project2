@@ -1,6 +1,6 @@
 /* Add your Application JavaScript */
-Vue.component('app-header', {
-    template: `
+Vue.component("app-header", {
+  template: `
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
       <a class="navbar-brand cursive" href="#"><i class="fas fa-camera"> <img src = "../static/uploads/camera.png" width = "20" height = "24" class = "pb-1 mr-2"> </i> Photogram </a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,22 +24,21 @@ Vue.component('app-header', {
         </ul>
       </div>
     </nav>
-    `
+    `,
 });
 
-Vue.component('app-footer', {
-    template: `
+Vue.component("app-footer", {
+  template: `
     <footer>
         <div class="container">
             <p>Copyright &copy; Flask Inc.</p>
         </div>
     </footer>
-    `
+    `,
 });
 
-
-const Home = Vue.component('home', {
-    template: `
+const Home = Vue.component("home", {
+  template: `
     <div class ="d-flex align-content-center t m-4 "> 
         <div class = "d-flex flex-row align-content-center  h-50"> 
             <div class = " m-2 w-50" > 
@@ -67,26 +66,89 @@ const Home = Vue.component('home', {
     </div>
 
    `,
-    data: function () {
-        return {}
-    }
+  data: function () {
+    return {};
+  },
 });
 
-const NotFound = Vue.component('not-found', {
-    template: `
+const Explore = Vue.component("explore", {
+  template: `
+      <div class="container">
+          <div class="row explore-card">
+            <div class="col-md-9">
+              <div class="card explore-card-btm mb-3  explore-card-group" v-for= "post in posts" >
+                  <div class="card-header explore-card-header">
+
+                      <!--place user profile image here-->
+
+                      <div class="explore-card-pi">
+                          <img src="/static/uploads/bridge.jpg" class="card-img-top" alt="..." width="30" height="30">
+                      </div>
+
+                      <!-place username here-->
+                      <p class="explore-card-username" ><a href="#" ><strong>{{username}}</strong></a></p>
+                  </div>
+                  <img src="/static/uploads/bridge.jpg" class="card-img-top explore-card-postimg" alt="..." >
+
+                  <div class="card-body">
+                      <p class="card-text">
+                      {{post}}
+                      {{body}}
+                      </p>
+                  </div>
+
+                  <div class="card-footer" style="background-color: white;">
+                      <div class="float-left">
+                      <p> <i class = "fas fa camera" ></i><strong>10 likes</strong></p> 
+                      </div>
+
+                      <!--place date here-->
+
+                      <div class="float-right">
+                      <p><strong>{{created_on}}</strong></p>
+                      </div>
+                  </div>
+              </div>
+            </div>
+            <div class="col-md-3 float-right">
+            
+                <button class = "btn btn-primary m-3 p-2 w-100 text-white""> New Post </button> 
+       
+            </div>
+            
+          </div>
+          
+      
+  
+    </div>
+    `,
+  data: function () {
+    return {
+      username: "username",
+      body: `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut 
+        labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris 
+        nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit 
+        esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in 
+        culpa qui officia deserunt mollit anim id est laborum.`,
+      created_on: "April 24, 2018",
+      posts: ["post1", "post2", "post3"],
+    };
+  },
+});
+
+const NotFound = Vue.component("not-found", {
+  template: `
     <div>
         <h1>404 - Not Found</h1>
     </div>
     `,
-    data: function () {
-        return {}
-    }
+  data: function () {
+    return {};
+  },
 });
 
-const Register = Vue.component('register', {
-    template:
-
-    `
+const Register = Vue.component("register", {
+  template: `
     
             <div class = "card w-50 d-flex flex-column m-2 border rounded">
                 <div> 
@@ -172,47 +234,44 @@ const Register = Vue.component('register', {
         
         </div>
         `,
-        data: function(){
-            return {
-                success: [], 
-                errors :[]
-
-            }
-        }, 
-    methods: {
-        registerInfo: function () {
-            
-            let self = this;
-            let registerForm = document.getElementById('RegisterForm');
-            let form_data = new FormData(registerForm);
-            fetch('/api/users/register', {
-                method: 'POST',
-                body: form_data,
-                headers: {
-                    "X-CSRFToken": token
-                },
-                credentials: "same-origin"
-
-            })
-                .then(function (response) {
-                    return response.json();
-                })
-                // .then((text)=> console.log(text))
-                .then( function(jsonResponse) {
-                    // display a success message
-                    console.log(jsonResponse);
-                    self.success= jsonResponse.success;
-                    self.errors = jsonResponse.errors;
-                })
-                .catch(function (error) {
-                    console.log(error);
-                });
-        }
-    }
+  data: function () {
+    return {
+      success: [],
+      errors: [],
+    };
+  },
+  methods: {
+    registerInfo: function () {
+      let self = this;
+      let registerForm = document.getElementById("RegisterForm");
+      let form_data = new FormData(registerForm);
+      fetch("/api/users/register", {
+        method: "POST",
+        body: form_data,
+        headers: {
+          "X-CSRFToken": token,
+        },
+        credentials: "same-origin",
+      })
+        .then(function (response) {
+          return response.json();
+        })
+        // .then((text)=> console.log(text))
+        .then(function (jsonResponse) {
+          // display a success message
+          console.log(jsonResponse);
+          self.success = jsonResponse.success;
+          self.errors = jsonResponse.errors;
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    },
+  },
 });
 
-const Login = Vue.component('login', {
-    template: `
+const Login = Vue.component("login", {
+  template: `
         <div>
     
        <div class = "d-flex flex-column align-items-center m-2"> 
@@ -253,49 +312,45 @@ const Login = Vue.component('login', {
     
     
     
-    `, 
-    data: function(){
-        return{ 
-            success: [], 
-            erros: []
-        }
-
-    }, 
-    methods: {
-        LoginUser: function () {
-
-            let self = this;
-            let loginForm = document.getElementById('LoginForm');
-            let form_data = new FormData(loginForm);
-            fetch('/api/auth/login', {
-                method: 'POST',
-                body: form_data,
-                headers: {
-                    "X-CSRFToken": token
-                },
-                credentials: "same-origin"
-
-            })
-                .then(function (response) {
-                    return response.json();
-                })
-                // .then((text)=> console.log(text))
-                .then(function (jsonResponse) {
-                    // display a success message
-                    console.log(jsonResponse);
-                    self.success = jsonResponse.success;
-                    self.errors = jsonResponse.errors;
-                })
-                .catch(function (error) {
-                    console.log(error);
-                });
-        }
-    }
+    `,
+  data: function () {
+    return {
+      success: [],
+      erros: [],
+    };
+  },
+  methods: {
+    LoginUser: function () {
+      let self = this;
+      let loginForm = document.getElementById("LoginForm");
+      let form_data = new FormData(loginForm);
+      fetch("/api/auth/login", {
+        method: "POST",
+        body: form_data,
+        headers: {
+          "X-CSRFToken": token,
+        },
+        credentials: "same-origin",
+      })
+        .then(function (response) {
+          return response.json();
+        })
+        // .then((text)=> console.log(text))
+        .then(function (jsonResponse) {
+          // display a success message
+          console.log(jsonResponse);
+          self.success = jsonResponse.success;
+          self.errors = jsonResponse.errors;
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    },
+  },
 });
 
-const Logout = Vue.component('logout', {
-    template: 
-    `
+const Logout = Vue.component("logout", {
+  template: `
     <div class = "m-5 text-center"> 
         <h1> 
         You have been logged out
@@ -303,14 +358,11 @@ const Logout = Vue.component('logout', {
     </div> 
 
 
-    `
-
+    `,
 });
 
-
-
-const UserProfile = Vue.component('profile', {
-    template: `
+const UserProfile = Vue.component("profile", {
+  template: `
         <div>
             <div class = "shadow p-3 mb-5 bg-white rounded">
                 <div class = "row">
@@ -390,48 +442,47 @@ const UserProfile = Vue.component('profile', {
     
        
         </div>
-    ` ,
-    data: function(){
-        return {
-            username: 'Jane Doe',
-            location: 'Kingston, Ja',
-            membership: 'Jan 2020',
-            biography: 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
-            postNum: '93',
-            follNum: '239',
-            posts: []
-        }
-    }
+    `,
+  data: function () {
+    return {
+      username: "Jane Doe",
+      location: "Kingston, Ja",
+      membership: "Jan 2020",
+      biography:
+        "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.",
+      postNum: "93",
+      follNum: "239",
+      posts: [],
+    };
+  },
 });
-
 
 // Define Routes
 const router = new VueRouter({
-    mode: 'history',
-    routes: [
-        { path: "/", component: Home },
+  mode: "history",
+  routes: [
+    { path: "/", component: Home },
 
-        {path: "/register", component: Register},
+    { path: "/register", component: Register },
 
-        { path: "/login", component: Login },
+    { path: "/login", component: Login },
 
-        // { path: "/logout", component: Logout },
+    // { path: "/logout", component: Logout },
 
-        // { path: "/explore", component: Explore},
+    { path: "/explore", component: Explore },
 
-        { path: "/users/{user_id}", component: UserProfile },
-        
+    { path: "/users/{user_id}", component: UserProfile },
 
-        // { path: "/posts/new", component: NewPost},
+    // { path: "/posts/new", component: NewPost},
 
-        // Put other routes here
-        // This is a catch all route in case none of the above matches
-        { path: "*", component: NotFound }
-    ]
+    // Put other routes here
+    // This is a catch all route in case none of the above matches
+    { path: "*", component: NotFound },
+  ],
 });
 
 // Instantiate our main Vue Instance
 let app = new Vue({
-    el: "#app",
-    router
+  el: "#app",
+  router,
 });
