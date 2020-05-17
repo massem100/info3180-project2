@@ -4,31 +4,55 @@ Jinja2 Documentation:    http://jinja.pocoo.org/2/documentation/
 Werkzeug Documentation:  http://werkzeug.pocoo.org/documentation/
 This file creates your application.
 """
-import os
-from app import app, db, login_manager
-from flask import render_template, request, jsonify, flash, session
+import os 
+import base64
+from app import app, db, login_manager,jwt
+from flask import render_template, request, jsonify, flash, session, _request_ctx_stack
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import current_user, logout_user, login_user, login_required
 from app.forms import RegisterForm, PostForm, LoginForm
 from app.models import User, Post, Like, Follow
 from datetime import datetime
+from functools import wraps
 
-###
-# Routing for your application.
-###
-# @app.route('/api/users/<user_id>/posts', methods = ['POST'])
-# def addposts(user_id):
-#     posts = (db.session.query(Post).filter_by(current_user.id==user_id).all())
-#     return jsonify(message = [{"post ID" : posts.id,
-#                                  "photo" : posts.photo,
-#                                  "caption" : posts.caption,
-#                                   "created on" : posts.created_on}])
-            
-        
+
+# Create a JWT @requires_auth decorator
+# This decorator can be used to denote that a specific route should check
+# for a valid JWT token before displaying the contents of that route.
+def requires_auth(f):
+  @wraps(f)
+  def decorated(*args, **kwargs):
+    auth = request.headers.get('Authorization', None)
+    if not auth:
+      return jsonify({'code': 'authorization_header_missing', 'description': 'Authorization header is expected'}), 401
+
+    parts = auth.split()
+
+    if parts[0].lower() != 'bearer':
+      return jsonify({'code': 'invalid_header', 'description': 'Authorization header must start with Bearer'}), 401
+    elif len(parts) == 1:
+      return jsonify({'code': 'invalid_header', 'description': 'Token not found'}), 401
+    elif len(parts) > 2:
+      return jsonify({'code': 'invalid_header', 'description': 'Authorization header must be Bearer + \s + token'}), 401
+
+    token = parts[1]
+    try:
+         payload = jwt.decode(token, 'some-secret')
+
+    except jwt.ExpiredSignature:
+        return jsonify({'code': 'token_expired', 'description': 'token is expired'}), 401
+    except jwt.DecodeError:
+        return jsonify({'code': 'token_invalid_signature', 'description': 'Token signature is invalid'}), 401
+
+    g.current_user = user = payload
+    return f(*args, **kwargs)
+
+  return decorated     
   
 
 @app.route('/api/users/{user_id}/posts', methods=['GET', 'POST'])
+@login_required
 def userposts(user_id):
     form = PostForm()
     id = int(user_id)
@@ -77,8 +101,8 @@ def userposts(user_id):
                      "numpost": total_posts,
                      "numfollower": follow,
                      "follower": followers_list}]
-        # print(response)
-        return jsonify(post_results), jsonify(response)
+        print(post_results)
+        return jsonify(posts = post_results)
     else:
         return jsonify(error=[{"errors": "Connection not achieved"}])
 
@@ -87,6 +111,7 @@ def userposts(user_id):
 
 
 @app.route('/api/users/{user_id}/follow',  methods=['POST'])
+@requires_auth
 def follow():
     if request.method == 'POST':
         current_user = int(request.form['follower_id'])
@@ -123,6 +148,7 @@ def posts():
 
 
 @app.route('/api/posts/{post_id}/like', methods = ['POST'])
+@requires_auth
 def likes(post_id): 
     if request.method == 'POST':
         user_id = int(request.form['user_id'])
@@ -136,10 +162,10 @@ def likes(post_id):
         return jsonify(error=[{'error': 'Connection not achieved'}])
 
     
-@app.route('/api/users/register', methods=['GET', 'POST'])
+@app.route('/api/users/register', methods=["POST"])
 def register():
     form = RegisterForm()
-    if request.method == 'POST' and form.validate_on_submit():
+    if request.method == "POST" and form.validate_on_submit():
     
         print('here')
         username = form.username.data
@@ -184,7 +210,7 @@ def register():
 
 
 
-@app.route('/api/auth/login', methods = ['POST'])
+@app.route('/api/auth/login', methods=["POST"])
 def login(): 
     form = LoginForm()
     if request.method == "POST" and form.validate_on_submit() and form.username.data:
@@ -198,7 +224,7 @@ def login():
             login_user(user)
             # remember to flash a message to the user
             # flash('You have been logged in successfully.', 'success')
-        return jsonify(message=[{"message": 'You have been logged in successfully.'}])
+        return jsonify(data=[{"message": 'You have been logged in successfully.'}])
     else:
         error_list = form_errors(form)
         return jsonify(errors=[{"error message": 'Invalid username or password', 'errors': error_list}])
@@ -206,7 +232,7 @@ def login():
 
 
 @app.route('/api/auth/logout', methods = ['GET'])
-@login_required
+@requires_auth
 def logout():
     logout_user()
     flash('Unfortunately, you have been logged out.', 'danger')

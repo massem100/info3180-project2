@@ -54,9 +54,9 @@ const Home = Vue.component("home", {
                         </div>
                         <div class = "d-flex flex-row w-100 justify-content-center"> 
 
-                            <button class = "btn btn-success m-3 p-2 w-50 text-white" @click="$router.push('register')"> Register </button> 
+                            <button class = "btn btn-green m-3 p-2 w-50 text-white font-weight-bold" @click="$router.push('register')"> Register </button> 
                             
-                            <button class = "btn btn-primary text-white w-50 p-2 m-3" @click="$router.push('login')"> Login </button>  
+                            <button class = "btn btn-primary text-white w-50 p-2 m-3 font-weight-bold" @click="$router.push('login')"> Login </button>  
                         </div>
                 </div> 
           
@@ -149,9 +149,9 @@ const NotFound = Vue.component("not-found", {
 
 const Register = Vue.component("register", {
   template: `
-    
-            <div class = "card w-50 d-flex flex-column m-2 border rounded">
-                <div> 
+      <div class = "d-flex flex-column align-items-center">
+            <h4 class = "font-weight-bold "> Register </h4>
+            <div class = "m-2"> 
                         <ul v-for= "data in success" class="list alert alert-success"> 
                                 {{data.message}}
                         
@@ -169,47 +169,49 @@ const Register = Vue.component("register", {
 
                         </ul> 
                 </div>
-                <form class="form-group m-4 p-2" @submit.prevent="registerInfo" method='POST' id="RegisterForm" enctype ="multipart/form-data">
+            <div class = "card w-50 h-60 d-flex flex-column m-2 border rounded">
+                
+                <form class="form-group m-4 p-2 " @submit.prevent="registerInfo" method='POST' id="RegisterForm" enctype ="multipart/form-data">
                    
                     
-                        <div class="col-xs-6">
-                            <label for="username"> <h4> Username </h4> </label>
+                        <div class="col-xs-5">
+                            <label for="username"> <h5> Username </h5> </label>
                             <input type="text"  class = "form-control" name="username" id="username" placeholder="Enter a username">
                         </div>
                     
                     
-                        <div class="col-xs-6">
-                            <label for="password"> <h4>Password</h4> </label>
+                        <div class="col-xs-5">
+                            <label for="password"> <h5>Password</h5> </label>
                             <input type="password" class = "form-control" name="password" id="password" placeholder="password" >
                         </div>
                     
-                        <div class="col-xs-6">
-                            <label for="first_name"> <h4> First name</h4> </label>
+                        <div class="col-xs-5">
+                            <label for="first_name"> <h5> First name</h5> </label>
                             <input type="text"   class = "form-control" name="first_name" id="first_name" placeholder="first name" >
                         </div>
                     
 
-                        <div class="col-xs-6">
-                            <label for="last_name"> <h4>Last name</h4> </label>
+                        <div class="col-xs-5">
+                            <label for="last_name"> <h5>Last name</h5> </label>
                             <input type="text" class = "form-control" name="last_name" id="last_name"
                                 placeholder="last name" >
                         </div>
                    
-                        <div class="col-xs-6">
-                            <label for="email"> <h4>Email</h4>  </label>
+                        <div class="col-xs-5">
+                            <label for="email"> <h5>Email</h5>  </label>
                             <input type="text" class = "form-control" name="email" id="email" placeholder="you@email.com" >
                         </div>
-                         <div class="col-xs-6">
-                            <label for="location"> <h4>Location</h4>  </label>
+                         <div class="col-xs-5">
+                            <label for="location"> <h5>Location</h5>  </label>
                             <input type="text"  class = "form-control"id="location" name = "location" placeholder="Where are you from?">
                         </div>
                    
-                        <div class="col-xs-6">
-                            <label for="biography"> <h4>Biography</h4></label>
+                        <div class="col-xs-5">
+                            <label for="biography"> <h5>Biography</h5></label>
                             <textarea  rows ="4" class = "form-control" id="biography" name = "biography" placeholder="Enter a biography, Max Characters: 250"></textarea>
                         </div>
                         <div class = "mt-2 mb-2">
-                        <h4> Photo</h4> 
+                        <h5> Photo</h5> 
                         <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
@@ -219,7 +221,7 @@ const Register = Vue.component("register", {
                             <input type="file" class="custom-file-input"  name = "photo" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
                             <label class="custom-file-label" for="inputGroupFile01">Choose Files</label>
                         </div>
-                        </div>0
+                        </div>
                     </div>
                     <div class=" d-flex justify-content-center p-2">
                         <div class="col-xs-12">
@@ -232,6 +234,7 @@ const Register = Vue.component("register", {
                 </form>
            
         
+        </div>
         </div>
         `,
   data: function () {
@@ -256,7 +259,6 @@ const Register = Vue.component("register", {
         .then(function (response) {
           return response.json();
         })
-        // .then((text)=> console.log(text))
         .then(function (jsonResponse) {
           // display a success message
           console.log(jsonResponse);
@@ -275,33 +277,28 @@ const Login = Vue.component("login", {
         <div>
     
        <div class = "d-flex flex-column align-items-center m-2"> 
-            <h4 class = "d-flex justify-content-left font-weight-bold"> Login</h4>
-            <div class = "card w-50 d-flex m-2 border rounded">
-                <form class="form-group m-4 p-2" method="post"  id= "LoginForm" enctype = 'multipart/form-data'>
-                    <div class="form-group mt-3">
-                        <div class="col-xs-6">
+            <h5 class = "d-flex justify-content-left font-weight-bold"> Login</h5>
+            <div class = "bg-white w-40 m-2 p-4 border rounded  shadow-lg">
+                <form class="form-group p-2 " method="POST"   @submit.prevent="LoginUser" id= "LoginForm" >
+                <div class = "d-flex flex-column align-content-center m-4 p-2">
+                    <div class=" mt-3">
                             <label for="username">
-                                <h4>Username</h4>
+                                <h5>Username</h5>
                             </label>
-                            <input type="text"  name="username" id="username" placeholder="Enter a username" >
-                        </div>
+                            <input class = "input-group input-group-lg p-2  mb-2" type="text"  name="username" id="username" placeholder="Enter a username" >
                     </div>
-                    <div class="form-group">
-                        <div class="col-xs-6">
-                            <label for="password">
-                                <h4>Password</h4>
+                    <div class="mb-2">
+                      <label for="password">
+                                <h5>Password</h5>
                             </label>
-                            <input type="password"  name="password" id="password"
-                                placeholder="password" >
-                        </div>
+                            <input class = "input-group input-group-lg p-2  mb-2" type="password"  name="password" id="password"
+                                placeholder="Enter Password" >
                     </div>                             
-                    <div class="form-group d-flex justify-content-center p-2">
-                        <div class="col-xs-12">
-                            <br>
-                            <button class="btn btn-lg btn-success" type="submit"><i
+                    <div class=" d-flex justify-content-center mb-2 p-2">
+                            <button class="btn btn-lg btn-green text-white font-weight-bold" v-if = "isAuthenticated" type="submit"><i
                                     class="glyphicon glyphicon-ok-sign"></i> Login </button>
-                            
-                        </div>
+                       
+                    </div>
                     </div>
                 </form>
             </div>
@@ -316,7 +313,8 @@ const Login = Vue.component("login", {
   data: function () {
     return {
       success: [],
-      erros: [],
+      errors: [],
+      isAuthenticated: true
     };
   },
   methods: {
@@ -328,19 +326,24 @@ const Login = Vue.component("login", {
         method: "POST",
         body: form_data,
         headers: {
-          "X-CSRFToken": token,
+          "X-CSRFToken": token
+        
         },
         credentials: "same-origin",
       })
         .then(function (response) {
           return response.json();
+          console.log(response.headers);
         })
         // .then((text)=> console.log(text))
         .then(function (jsonResponse) {
           // display a success message
           console.log(jsonResponse);
-          self.success = jsonResponse.success;
+          self.success = jsonResponse.data;
           self.errors = jsonResponse.errors;
+        })
+        .then(function (response){
+          router.push('explore')
         })
         .catch(function (error) {
           console.log(error);
@@ -359,6 +362,16 @@ const Logout = Vue.component("logout", {
 
 
     `,
+    data: function(){
+      return {
+
+      }
+    }, 
+    methods: {
+      Logout: function(){
+
+      }
+    }
 });
 
 const UserProfile = Vue.component("profile", {
@@ -419,9 +432,6 @@ const UserProfile = Vue.component("profile", {
 
                 </div>
 
-
-
-
             </div>
 
             <div class = "row">
@@ -445,6 +455,7 @@ const UserProfile = Vue.component("profile", {
     `,
   data: function () {
     return {
+      userid: 1,
       username: "Jane Doe",
       location: "Kingston, Ja",
       membership: "Jan 2020",
@@ -455,8 +466,59 @@ const UserProfile = Vue.component("profile", {
       posts: [],
     };
   },
-});
+  methods: {
+    getposts: function() {
 
+      fetch("/api/users/{user_id}/posts", {
+        method: "GET",
+        headers: {
+          "X-CSRFToken": token
+
+        },
+        credentials: "same-origin",
+      })
+        .then(function (response) {
+          return response.json();
+          console.log(response.headers);
+        })
+        .then(function (jsonResponse) {
+          // display a success message
+          console.log(jsonResponse);
+          
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    },
+
+  }
+});
+const NewPost = Vue.component('new-post', {
+  template: 
+  `
+        <div> 
+          <h5> New Post </h5>
+          <div class = "bg- white ">
+
+          </div>
+
+        </div>
+  
+  
+  
+  `, 
+  data: function() {
+    return {
+
+    };
+  }, 
+  methods: {
+    Newpost: function () {
+
+
+    }
+  }
+});
 // Define Routes
 const router = new VueRouter({
   mode: "history",
@@ -467,13 +529,13 @@ const router = new VueRouter({
 
     { path: "/login", component: Login },
 
-    // { path: "/logout", component: Logout },
+    { path: "/logout", component: Logout },
 
     { path: "/explore", component: Explore },
 
     { path: "/users/{user_id}", component: UserProfile },
 
-    // { path: "/posts/new", component: NewPost},
+    { path: "/posts/new", component: NewPost},
 
     // Put other routes here
     // This is a catch all route in case none of the above matches
@@ -484,5 +546,5 @@ const router = new VueRouter({
 // Instantiate our main Vue Instance
 let app = new Vue({
   el: "#app",
-  router,
+  router
 });
