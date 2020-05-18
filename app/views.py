@@ -66,7 +66,7 @@ def userposts(user_id):
             secure_file = secure_filename(photo.filename)
             photo.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_file))
             
-            new_post = Post(user_id, photo, caption)
+            new_post = Post(id, secure_file, caption)
             db.session.add(new_post)
             db.session.commit()
             return jsonify(response=[{"message": "Successfully created a new post"}])
@@ -82,27 +82,28 @@ def userposts(user_id):
         follow = len(followers)
         for follower in followers:
             followers_list.append(follower.user_id)
-        for user in user_posts:
-            post_results.append({'id': user.id, 
-                        'user_id': user.user_id,
-                        'photo': user.photo,
-                        'caption': user.caption,
-                      'created_on': user.created_on,
+        for user_post in user_posts:
+            post_results.append({'id': user_post.id, 
+                        'user_id': user_post.user_id,
+                        'photo': user_post.photo,
+                        'caption': user_post.caption,
+                      'created_on': user_post.created_on,
                        'likes': 0})
 
-        response = [{"id": user_id, "username": userdetail.username,
+        response = [{"id": user_id, 
+                    "username": userdetail.username,
                      "firstname": userdetail.first_name,
                      "lastname": userdetail.last_name,
                      "email": userdetail.email,
                      "location": userdetail.location,
-                     "biography": userdetail.biography,
-                     "profile_photo": userdetail.profile_photo,
+                     "biography": userdetail.bio,
+                     "profile_photo": userdetail.proPhoto,
                      "joined_on": userdetail.joined_on,
                      "posts": post_results,
                      "numpost": total_posts,
                      "numfollower": follow,
                      "follower": followers_list}]
-        return jsonify(posts = post_results)
+        return jsonify(posts = post_results, response = response)
     else:
         return jsonify(error=[{"errors": "Connection not achieved"}])
 
@@ -112,14 +113,14 @@ def userposts(user_id):
 
 @app.route('/api/users/{user_id}/follow',  methods=['POST'])
 @requires_auth
-def follow():
+def follow(user_id):
     if request.method == 'POST':
         current_user = int(request.form['follower_id'])
         target_user = int(request.form['user_id'])        
-        follows = Follow.query.filter_by(user_id=target_user).all()
+        followers = Follow.query.filter_by(user_id=target_user).all()
         count= ''
-        for follow in follows:
-            if current_user == follow.follower_id:
+        for follower in followers:
+            if current_user == follower.follower_id:
                 count = 1
 
         if count != 1:
@@ -129,10 +130,10 @@ def follow():
 
             user = User.query.filter_by(id=target_user).first()
             follow_total = len(Follow.query.filter_by(user_id=target_user).all())
-            return jsonify(response=[{"message": "You are now following that user." + user.username, "follow": follow_total}])
+            return jsonify(response=[{"message": "You are now following that user." + user.username, "followers": follow_total}])
         else:
             follow_total = len(Follow.query.filter_by(user_id=target_user).all())
-            return jsonify(response=[{"message": "You are already following that user.", "follow": follow_total}])
+            return jsonify(response=[{"message": "You are already following that user.", "followers": follow_total}])
     else:
         return jsonify(errors=[{'error': 'Connection not achieved'}])
 
@@ -148,7 +149,6 @@ def all_posts():
     if request.method == 'GET':
         post_list = []
         
-        # print(userinfo)
         user_posts = Post.query.order_by(Post.user_id).all()
         # print(user_posts)
         for post in user_posts:
@@ -248,7 +248,7 @@ def login():
                 payload = {'userid': user.id}
                 token = jwt.encode(payload, jwt_token, algorithm='HS256').decode('utf-8')
                 # data = {'token': token}, message = "Token Generated"
-                return jsonify(success = [{"token": token, "message": "User successfully logged in."}])
+                return jsonify(success = [{"token": token,"userid": user.id, "message": "User successfully logged in."}])
             return jsonify(errors = [{"errors": "Password not a match"}])
         return jsonify(errors=[{"errors": "Username already exists "}])  
     else:
@@ -259,6 +259,7 @@ def login():
 
 @app.route('/api/auth/logout', methods = ['GET'])
 @requires_auth
+@login_required
 def logout():
     logout_user()
     return jsonify(message = [{'message': "You have been logged out successfully"}])

@@ -16,10 +16,10 @@ Vue.component("app-header", {
             <router-link class="nav-link" to="/explore">Explore<span class="sr-only">(current)</span></router-link>
           </li>
           <li class="nav-item active">
-            <router-link class="nav-link" to="/users"> My Profile <span class="sr-only">(current)</span></router-link>
+            <router-link class="nav-link" to="/users/:user_id"> My Profile <span class="sr-only">(current)</span></router-link>
           </li>
           <li class="nav-item active">
-            <router-link class="nav-link" to="/logout">Logout<span class="sr-only">(current)</span></router-link>
+            <router-link id = "Logout" class="nav-link" to="/logout">Logout<span class="sr-only">(current)</span></router-link>
           </li>
         </ul>
       </div>
@@ -115,8 +115,7 @@ const Explore = Vue.component("explore", {
               </div>
             </div>
             <div class="col-md-3 float-right">
-            
-                <button class = "btn btn-primary m-3 p-2 w-100 text-white""> New Post </button> 
+              <router-link class="btn btn-primary m-3 p-2 w-100 text-white" to="/posts/new">New Post</router-link> 
        
             </div>
             
@@ -284,6 +283,9 @@ const Register = Vue.component("register", {
         .then(function (jsonResponse) {
           // display a success message
           console.log(jsonResponse);
+          if (jsonResponse.success["0"].message == "Successfully registered" ){
+
+          }
           self.success = jsonResponse.success;
           self.errors = jsonResponse.errors;
         })
@@ -363,14 +365,14 @@ const Login = Vue.component("login", {
           // self.success = jsonResponse.success;
           // self.errors = jsonResponse.errors;
           if (jsonResponse.success != null) {
-            // let userid = jsonResponse.success["0"].userid;
+            let userid = jsonResponse.success["0"].userid;
             let jwt_token = jsonResponse.success["0"].token;
             localStorage.setItem('token', jwt_token);
-            // localStorage.setItem('userid', userid);
+            localStorage.setItem('userid', userid);
             console.info('Token generated and added to localStorage.');
             self.token = jwt_token;
             self.$router.push("/explore");
-            msg = "Login was successfully";
+            msg = "Login successful";
           }
           else {
             self.msg = jsonResponse.errors['0'];
@@ -387,42 +389,47 @@ const Logout = Vue.component("logout", {
   template: `
     <div class = "m-5 text-center"> 
         <h1> 
-        You have been logged out
+        {{message}}
         </h1>
     </div> 
-
-
     `,
     data: function(){
       return {
+        message: "",
         
 
       }
     }, 
-    methods: {
-      LogoutUser: function(){
-        fetch('api/auth/logout', {
-          method: 'GET',
-          headers:  {
-          "X-CSRFToken": token,
-
-        },
-          credentials: "same-origin",
-      })
+  created: function () {
+    let self = this;
+    fetch("/api/auth/logout", {
+      method: 'GET',
+      'headers': {
+        'Authorization': 'Bearer ' + localStorage.getItem('token'),
+        'X-CSRFToken': token
+      },
+      credentials: 'same-origin'
+    })
       .then(function (response) {
         return response.json();
-        // console.log(response.headers);
-        router.push('logout')
       })
       .then(function (jsonResponse) {
         // display a success message
-        console.log(jsonResponse);
-
-  });
-
-      
-    }
+        //console.log(jsonResponse);
+        if (jsonResponse.response["0"].message == "You have been logged out successfully") {
+          localStorage.removeItem('token');
+          localStorage.removeItem('userid');
+          let message= "You have been logged out ";
+          let logout = document.getElementById('Logout');
+          logout.classList.add('hide-display');
+          // self.$router.push('/');
+        }
+      })
+      .catch(function (error) {
+        // console.log(error);
+      });
   }
+    
 });
 
 const UserProfile = Vue.component("profile", {
@@ -519,7 +526,7 @@ const UserProfile = Vue.component("profile", {
   },
   methods: {
     getposts: function() {
-
+        // still in progress
       fetch("/api/users/{user_id}/posts", {
         method: "GET",
         headers: {
@@ -549,8 +556,20 @@ const NewPost = Vue.component('new-post', {
   `
         <div> 
           <h5> New Post </h5>
-          <div class = "bg- white ">
-
+          <div class = " bg-white ">
+            <form class="form" id="PostForm"  @submit.prevent="NewPost" method="POST" enctype="multipart/form-data">
+              <div> 
+                <label for= 'photo' >Photo</label> 
+                <input type = "file" id = "photo" name = "photo">
+              </div>
+              <div> 
+                  <label for= 'caption' > Caption</label> 
+                  <input type = "text" name = "caption" >
+              </div>
+              <div>
+                <button class = "btn btn-primary" type = "submit"> New Post</button> 
+              </div> 
+            </form>
           </div>
 
         </div>
@@ -560,13 +579,39 @@ const NewPost = Vue.component('new-post', {
   `, 
   data: function() {
     return {
+      id: 5,
 
     };
   }, 
   methods: {
-    Newpost: function () {
+    NewPost: function(){
 
+    let self = this; 
+    let post_form = document.getElementById('PostForm');
+    let form_data = new FormData(post_form); 
+    let userid = '' + self.id;
+    fetch('api/users/' + {user_id} + '/posts', {
+      method: "POST", 
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('token'),
+        'X-CSRFToken': token,
+      }, 
+      credentials: 'same-origin',
 
+    })
+    .then( function(response){
+      return response.json(); 
+
+    })
+    .then( function(jsonResponse){
+      console.log(jsonResponse)
+      // add if statement
+      // self.$router.push('/explore')
+      // self.
+    })
+
+    
+    
     }
   }
 });
@@ -584,7 +629,7 @@ const router = new VueRouter({
 
     { path: "/explore", component: Explore },
 
-    { path: "/users/{user_id}", component: UserProfile },
+    { path: "/users/:userid", component: UserProfile },
 
     { path: "/posts/new", component: NewPost},
 
