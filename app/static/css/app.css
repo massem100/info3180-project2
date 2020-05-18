@@ -7,7 +7,7 @@ body {
   height: 100px;
 }
 
-.btn-green{
+.btn-green {
   background-color: #46d246 !important;
 }
 
@@ -20,7 +20,7 @@ body {
   font-family: "Oleo Script", cursive;
 }
 
-.hide-display{
+.hide-display {
   visibility: hidden;
 }
 
@@ -120,4 +120,18 @@ body {
 
 .float-right {
   float: right;
+}
+
+/******* NEW POST PAGE ************/
+
+.nw-post-title {
+  margin-right: 437px;
+}
+
+.nw-post-container {
+  margin-top: 5%;
+}
+
+.nw-post-labels {
+  padding-bottom: 7%;
 }
