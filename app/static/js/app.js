@@ -25,6 +25,11 @@ Vue.component("app-header", {
       </div>
     </nav>
     `,
+    data: function(){
+      return {
+        
+      }
+    }
 });
 
 Vue.component("app-footer", {
@@ -82,30 +87,29 @@ const Explore = Vue.component("explore", {
                       <!--place user profile image here-->
 
                       <div class="explore-card-pi">
-                          <img src="/static/uploads/bridge.jpg" class="card-img-top" alt="..." width="30" height="30">
+                          <img :src=" '/static/uploads/' + post.proPhoto"class="card-img-top" alt="..." width="30" height="30">
                       </div>
 
                       <!-place username here-->
-                      <p class="explore-card-username" ><a href="#" ><strong>{{username}}</strong></a></p>
+                      <p class="explore-card-username" ><a href="#" ><strong>{{post.username}}</strong></a></p>
                   </div>
-                  <img src="/static/uploads/bridge.jpg" class="card-img-top explore-card-postimg" alt="..." >
+                  <img :src=" '/static/uploads/' + post.photo" class="card-img-top explore-card-postimg" alt="..." >
 
                   <div class="card-body">
                       <p class="card-text">
-                      {{post}}
-                      {{body}}
+                      {{post.caption}}
                       </p>
                   </div>
 
                   <div class="card-footer" style="background-color: white;">
                       <div class="float-left">
-                      <p> <i class = "fas fa camera" ></i><strong>10 likes</strong></p> 
+                      <p> <i class = "fas fa camera" ></i><strong>{{post.likes}} likes</strong></p> 
                       </div>
 
                       <!--place date here-->
 
                       <div class="float-right">
-                      <p><strong>{{created_on}}</strong></p>
+                      <p><strong>{{post.created_on}}</strong></p>
                       </div>
                   </div>
               </div>
@@ -124,16 +128,34 @@ const Explore = Vue.component("explore", {
     `,
   data: function () {
     return {
-      username: "username",
-      body: `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut 
-        labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris 
-        nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit 
-        esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in 
-        culpa qui officia deserunt mollit anim id est laborum.`,
-      created_on: "April 24, 2018",
-      posts: ["post1", "post2", "post3"],
+      posts: [], 
+      errors: []
     };
-  },
+  
+  }, 
+  created: function() { 
+      let self = this;
+      fetch("api/posts", {
+        method: "GET",
+        headers: {
+          'Authorization': 'Bearer ' +  localStorage.getItem('token'), 
+          'X-CSRFToken': token,
+        },
+        credentials: "same-origin",
+      })
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function (jsonResponse) {
+          console.log(jsonResponse);
+          self.posts = jsonResponse.response["0"].posts;
+          self.errors = jsonResponse.errors;
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+  
+}
 });
 
 const NotFound = Vue.component("not-found", {
@@ -333,17 +355,26 @@ const Login = Vue.component("login", {
       })
         .then(function (response) {
           return response.json();
-          console.log(response.headers);
         })
         // .then((text)=> console.log(text))
         .then(function (jsonResponse) {
           // display a success message
           console.log(jsonResponse);
-          self.success = jsonResponse.data;
-          self.errors = jsonResponse.errors;
-        })
-        .then(function (response){
-          router.push('explore')
+          // self.success = jsonResponse.success;
+          // self.errors = jsonResponse.errors;
+          if (jsonResponse.success != null) {
+            // let userid = jsonResponse.success["0"].userid;
+            let jwt_token = jsonResponse.success["0"].token;
+            localStorage.setItem('token', jwt_token);
+            // localStorage.setItem('userid', userid);
+            console.info('Token generated and added to localStorage.');
+            self.token = jwt_token;
+            self.$router.push("/explore");
+            msg = "Login was successfully";
+          }
+          else {
+            self.msg = jsonResponse.errors['0'];
+          }
         })
         .catch(function (error) {
           console.log(error);
@@ -364,14 +395,34 @@ const Logout = Vue.component("logout", {
     `,
     data: function(){
       return {
+        
 
       }
     }, 
     methods: {
-      Logout: function(){
+      LogoutUser: function(){
+        fetch('api/auth/logout', {
+          method: 'GET',
+          headers:  {
+          "X-CSRFToken": token,
 
-      }
+        },
+          credentials: "same-origin",
+      })
+      .then(function (response) {
+        return response.json();
+        // console.log(response.headers);
+        router.push('logout')
+      })
+      .then(function (jsonResponse) {
+        // display a success message
+        console.log(jsonResponse);
+
+  });
+
+      
     }
+  }
 });
 
 const UserProfile = Vue.component("profile", {

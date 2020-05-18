@@ -20,7 +20,7 @@ cors = CORS(app)
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
 
-
+jwt_token = app.config['TOKEN_KEY'] = "3cc8464f0b2eef61bf0872ebf640505db394175ed8d314ab9f2d9e6eb27552ce"
 # Flask_Login login manager
 login_manager = LoginManager()
 login_manager.init_app(app)

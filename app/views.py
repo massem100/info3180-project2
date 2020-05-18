@@ -6,8 +6,8 @@ This file creates your application.
 """
 import os 
 import base64
-from app import app, db, login_manager,jwt
-from flask import render_template, request, jsonify, flash, session, _request_ctx_stack
+from app import app, db, login_manager, jwt_token
+from flask import render_template, request, jsonify, flash, session, _request_ctx_stack,g
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import current_user, logout_user, login_user, login_required
@@ -15,6 +15,7 @@ from app.forms import RegisterForm, PostForm, LoginForm
 from app.models import User, Post, Like, Follow
 from datetime import datetime
 from functools import wraps
+import jwt
 
 
 # Create a JWT @requires_auth decorator
@@ -38,7 +39,7 @@ def requires_auth(f):
 
     token = parts[1]
     try:
-         payload = jwt.decode(token, 'some-secret')
+        payload = jwt.decode(token, jwt_token)
 
     except jwt.ExpiredSignature:
         return jsonify({'code': 'token_expired', 'description': 'token is expired'}), 401
@@ -52,7 +53,7 @@ def requires_auth(f):
   
 
 @app.route('/api/users/{user_id}/posts', methods=['GET', 'POST'])
-@login_required
+@requires_auth
 def userposts(user_id):
     form = PostForm()
     id = int(user_id)
@@ -75,7 +76,7 @@ def userposts(user_id):
         post_results = []
         followers_list = [0, 0]
         userdetail = User.query.filter_by(id=id).first()
-        user_posts = db.sesion.query(Post).filter_by(user_id=id).all()
+        user_posts = db.session.query(Post).filter_by(user_id=id).all()
         total_posts = len(user_posts)
         followers = Follow.query.filter_by(user_id=id).all()
         follow = len(followers)
@@ -101,7 +102,6 @@ def userposts(user_id):
                      "numpost": total_posts,
                      "numfollower": follow,
                      "follower": followers_list}]
-        print(post_results)
         return jsonify(posts = post_results)
     else:
         return jsonify(error=[{"errors": "Connection not achieved"}])
@@ -141,11 +141,29 @@ def follow():
         return jsonify([{"followers" : follow_total}])
 
 
-@app.route('/api/posts', methods = ['POST'])
-def posts():
+@app.route('/api/posts', methods = ['GET'])
+@requires_auth
+def all_posts():
 
-    return 'all posts'
-
+    if request.method == 'GET':
+        post_list = []
+        
+        # print(userinfo)
+        user_posts = Post.query.order_by(Post.user_id).all()
+        # print(user_posts)
+        for post in user_posts:
+            userinfo = User.query.filter_by(id=post.user_id).first()
+            likes = len(Like.query.filter_by(post_id=post.id).all())
+            post_list.append({'id': post.id,
+                                'user_id': post.user_id,
+                                'username': userinfo.username, 
+                                'proPhoto': userinfo.proPhoto,
+                                'photo': post.photo,
+                                'caption': post.caption,
+                                'created_on': post.created_on,
+                                'likes': likes})
+        return jsonify (response=[{'posts': post_list}])
+    return jsonify (errors=[{'error': 'No Connection '}])
 
 @app.route('/api/posts/{post_id}/like', methods = ['POST'])
 @requires_auth
@@ -219,15 +237,23 @@ def login():
         password = form.password.data
 
         user = User.query.filter_by(username=username).first()
-        if user is not None and check_password_hash(user.password, password):
-            # get user id, load into session
-            login_user(user)
-            # remember to flash a message to the user
-            # flash('You have been logged in successfully.', 'success')
-        return jsonify(data=[{"message": 'You have been logged in successfully.'}])
+        
+        if user is not None: 
+            if check_password_hash(user.password, password):
+                # get user id, load into session
+                login_user(user)
+                # remember to flash a message to the user
+                # flash('You have been logged in successfully.', 'success')
+                # print(user.id)
+                payload = {'userid': user.id}
+                token = jwt.encode(payload, jwt_token, algorithm='HS256').decode('utf-8')
+                # data = {'token': token}, message = "Token Generated"
+                return jsonify(success = [{"token": token, "message": "User successfully logged in."}])
+            return jsonify(errors = [{"errors": "Password not a match"}])
+        return jsonify(errors=[{"errors": "Username already exists "}])  
     else:
         error_list = form_errors(form)
-        return jsonify(errors=[{"error message": 'Invalid username or password', 'errors': error_list}])
+        return jsonify(errors=[{'errors': error_list}])
 
 
 
@@ -235,7 +261,7 @@ def login():
 @requires_auth
 def logout():
     logout_user()
-    flash('Unfortunately, you have been logged out.', 'danger')
+    return jsonify(message = [{'message': "You have been logged out successfully"}])
 
 @login_manager.user_loader
 def load_user(id):
