@@ -1,4 +1,4 @@
-#!"c:\users\jkanj\documents\1 uwi mona 2019, 2020\semester 2\info3180 dynamic web development\info3180-project2\venv\scripts\python.exe"
+#!c:\users\masse\desktop\f\info3180-project2\venv\scripts\python.exe
 # EASY-INSTALL-ENTRY-SCRIPT: 'autopep8==1.5.2','console_scripts','autopep8'
 __requires__ = 'autopep8==1.5.2'
 import re

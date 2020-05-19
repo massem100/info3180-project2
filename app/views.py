@@ -52,11 +52,12 @@ def requires_auth(f):
   return decorated     
   
 
-@app.route('/api/users/{user_id}/posts', methods=['GET', 'POST'])
+@app.route('/api/users/<user_id>/posts', methods=["POST", "GET"])
 @requires_auth
 def userposts(user_id):
     form = PostForm()
-    id = int(user_id)
+    id = user_id
+    # print(id)
     
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -66,12 +67,13 @@ def userposts(user_id):
             secure_file = secure_filename(photo.filename)
             photo.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_file))
             
-            new_post = Post(id, secure_file, caption)
+            new_post = Post(int(id), secure_file, caption)
             db.session.add(new_post)
             db.session.commit()
             return jsonify(response=[{"message": "Successfully created a new post"}])
         else:
             return jsonify(errors=[{"errors": form_errors(form)}])
+
     if request.method == 'GET':
         post_results = []
         followers_list = [0, 0]
@@ -104,8 +106,7 @@ def userposts(user_id):
                      "numfollower": follow,
                      "follower": followers_list}]
         return jsonify(posts = post_results, response = response)
-    else:
-        return jsonify(error=[{"errors": "Connection not achieved"}])
+    
 
 
     
@@ -149,7 +150,7 @@ def all_posts():
     if request.method == 'GET':
         post_list = []
         
-        user_posts = Post.query.order_by(Post.user_id).all()
+        user_posts = Post.query.order_by(Post.created_on).all()
         # print(user_posts)
         for post in user_posts:
             userinfo = User.query.filter_by(id=post.user_id).first()
@@ -162,7 +163,9 @@ def all_posts():
                                 'caption': post.caption,
                                 'created_on': post.created_on,
                                 'likes': likes})
-        return jsonify (response=[{'posts': post_list}])
+        
+        sorted_posts = sorted(post_list, key=lambda i: (post_list[0]['created_on']), reverse=True)
+        return jsonify (response=[{'posts': sorted_posts}])
     return jsonify (errors=[{'error': 'No Connection '}])
 
 @app.route('/api/posts/{post_id}/like', methods = ['POST'])

@@ -57,7 +57,7 @@ class Post(UserMixin,db.Model):
        self.user_id = user_id
        self.photo = photo
        self.caption = caption 
-       self.created_on = datetime.now()
+       self.created_on = datetime.now().strftime("%B %d, %Y")
 
     def is_authenticated(self):
         return True

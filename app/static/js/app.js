@@ -1,4 +1,5 @@
 /* Add your Application JavaScript */
+
 Vue.component("app-header", {
   template: `
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
@@ -134,7 +135,7 @@ const Explore = Vue.component("explore", {
     fetch("api/posts", {
       method: "GET",
       headers: {
-        Authorization: "Bearer " + localStorage.getItem("token"),
+        "Authorization": "Bearer " + localStorage.getItem("token"),
         "X-CSRFToken": token,
       },
       credentials: "same-origin",
@@ -283,6 +284,7 @@ const Register = Vue.component("register", {
           }
           self.success = jsonResponse.success;
           self.errors = jsonResponse.errors;
+          self.$router.push('/login')
         })
         .catch(function (error) {
           console.log(error);
@@ -396,7 +398,7 @@ const Logout = Vue.component("logout", {
     fetch("/api/auth/logout", {
       method: "GET",
       headers: {
-        Authorization: "Bearer " + localStorage.getItem("token"),
+        "Authorization": "Bearer " + localStorage.getItem("token"),
         "X-CSRFToken": token,
       },
       credentials: "same-origin",
@@ -517,29 +519,29 @@ const UserProfile = Vue.component("profile", {
       posts: [],
     };
   },
-  methods: {
-    getposts: function () {
-      // still in progress
-      fetch("/api/users/{user_id}/posts", {
-        method: "GET",
-        headers: {
-          "X-CSRFToken": token,
-        },
-        credentials: "same-origin",
-      })
-        .then(function (response) {
-          return response.json();
-          console.log(response.headers);
-        })
-        .then(function (jsonResponse) {
-          // display a success message
-          console.log(jsonResponse);
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-    },
-  },
+  // methods: {
+  //   getposts: function () {
+  //     // still in progress
+  //     fetch("/api/users/{user_id}/posts", {
+  //       method: "GET",
+  //       headers: {
+  //         "X-CSRFToken": token,
+  //       },
+  //       credentials: "same-origin",
+  //     })
+  //       .then(function (response) {
+  //         return response.json();
+  //         console.log(response.headers);
+  //       })
+  //       .then(function (jsonResponse) {
+  //         // display a success message
+  //         console.log(jsonResponse);
+  //       })
+  //       .catch(function (error) {
+  //         console.log(error);
+  //       });
+  //   },
+  // },
 });
 const NewPost = Vue.component("new-post", {
   template: `
@@ -583,31 +585,35 @@ const NewPost = Vue.component("new-post", {
   `,
   data: function () {
     return {
-      id: 5,
+      id: localStorage.getItem('userid'),
     };
   },
   methods: {
     NewPost: function () {
       let self = this;
-      let post_form = document.getElementById("PostForm");
-      let form_data = new FormData(post_form);
-      let userid = "" + self.id;
-      fetch("api/users/" + { user_id } + "/posts", {
+      let postForm = document.getElementById("PostForm");
+      let form_data = new FormData(postForm);
+      let userid = self.id;
+      fetch('/api/users/'+ userid + '/posts', {
         method: "POST",
+        body: form_data,
         headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
+          "Authorization": "Bearer " + localStorage.getItem("token"),
           "X-CSRFToken": token,
         },
         credentials: "same-origin",
       })
-        .then(function (response) {
+        .then(function(response) {
           return response.json();
         })
         .then(function (jsonResponse) {
           console.log(jsonResponse);
           // add if statement
-          // self.$router.push('/explore')
+          self.$router.push('/explore')
           // self.
+        })
+        .catch(function (error) {
+          console.log(error);
         });
     },
   },
