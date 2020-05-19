@@ -4,28 +4,52 @@ Jinja2 Documentation:    http://jinja.pocoo.org/2/documentation/
 Werkzeug Documentation:  http://werkzeug.pocoo.org/documentation/
 This file creates your application.
 """
-import os
-from app import app, db, login_manager
-from flask import render_template, request, jsonify, flash, session
+import os 
+import base64
+from app import app, db, login_manager, jwt_token
+from flask import render_template, request, jsonify, flash, session, _request_ctx_stack,g
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import current_user, logout_user, login_user, login_required
 from app.forms import RegisterForm, PostForm, LoginForm
 from app.models import User, Post, Like, Follow
 from datetime import datetime
+from functools import wraps
+import jwt
 
-###
-# Routing for your application.
-###
-# @app.route('/api/users/<user_id>/posts', methods = ['POST'])
-# def addposts(user_id):
-#     posts = (db.session.query(Post).filter_by(current_user.id==user_id).all())
-#     return jsonify(message = [{"post ID" : posts.id,
-#                                  "photo" : posts.photo,
-#                                  "caption" : posts.caption,
-#                                   "created on" : posts.created_on}])
-            
-        
+
+# Create a JWT @requires_auth decorator
+# This decorator can be used to denote that a specific route should check
+# for a valid JWT token before displaying the contents of that route.
+def requires_auth(f):
+  @wraps(f)
+  def decorated(*args, **kwargs):
+    auth = request.headers.get('Authorization', None)
+    if not auth:
+      return jsonify({'code': 'authorization_header_missing', 'description': 'Authorization header is expected'}), 401
+
+    parts = auth.split()
+
+    if parts[0].lower() != 'bearer':
+      return jsonify({'code': 'invalid_header', 'description': 'Authorization header must start with Bearer'}), 401
+    elif len(parts) == 1:
+      return jsonify({'code': 'invalid_header', 'description': 'Token not found'}), 401
+    elif len(parts) > 2:
+      return jsonify({'code': 'invalid_header', 'description': 'Authorization header must be Bearer + \s + token'}), 401
+
+    token = parts[1]
+    try:
+        payload = jwt.decode(token, jwt_token)
+
+    except jwt.ExpiredSignature:
+        return jsonify({'code': 'token_expired', 'description': 'token is expired'}), 401
+    except jwt.DecodeError:
+        return jsonify({'code': 'token_invalid_signature', 'description': 'Token signature is invalid'}), 401
+
+    g.current_user = user = payload
+    return f(*args, **kwargs)
+
+  return decorated     
   
 
 @app.route('/api/users/{user_id}/posts', methods=['GET', 'POST'])
@@ -86,14 +110,15 @@ def userposts(user_id):
 
 
 @app.route('/api/users/{user_id}/follow',  methods=['POST'])
-def follow():
+@requires_auth
+def follow(user_id):
     if request.method == 'POST':
         current_user = int(request.form['follower_id'])
         target_user = int(request.form['user_id'])        
-        follows = Follow.query.filter_by(user_id=target_user).all()
+        followers = Follow.query.filter_by(user_id=target_user).all()
         count= ''
-        for follow in follows:
-            if current_user == follow.follower_id:
+        for follower in followers:
+            if current_user == follower.follower_id:
                 count = 1
 
         if count != 1:
@@ -103,10 +128,10 @@ def follow():
 
             user = User.query.filter_by(id=target_user).first()
             follow_total = len(Follow.query.filter_by(user_id=target_user).all())
-            return jsonify(response=[{"message": "You are now following that user." + user.username, "follow": follow_total}])
+            return jsonify(response=[{"message": "You are now following that user." + user.username, "followers": follow_total}])
         else:
             follow_total = len(Follow.query.filter_by(user_id=target_user).all())
-            return jsonify(response=[{"message": "You are already following that user.", "follow": follow_total}])
+            return jsonify(response=[{"message": "You are already following that user.", "followers": follow_total}])
     else:
         return jsonify(errors=[{'error': 'Connection not achieved'}])
 
@@ -115,13 +140,31 @@ def follow():
         return jsonify([{"followers" : follow_total}])
 
 
-@app.route('/api/posts', methods = ['POST'])
-def posts():
+@app.route('/api/posts', methods = ['GET'])
+@requires_auth
+def all_posts():
 
-    return 'all posts'
-
+    if request.method == 'GET':
+        post_list = []
+        
+        user_posts = Post.query.order_by(Post.user_id).all()
+        # print(user_posts)
+        for post in user_posts:
+            userinfo = User.query.filter_by(id=post.user_id).first()
+            likes = len(Like.query.filter_by(post_id=post.id).all())
+            post_list.append({'id': post.id,
+                                'user_id': post.user_id,
+                                'username': userinfo.username, 
+                                'proPhoto': userinfo.proPhoto,
+                                'photo': post.photo,
+                                'caption': post.caption,
+                                'created_on': post.created_on,
+                                'likes': likes})
+        return jsonify (response=[{'posts': post_list}])
+    return jsonify (errors=[{'error': 'No Connection '}])
 
 @app.route('/api/posts/{post_id}/like', methods = ['POST'])
+@requires_auth
 def likes(post_id): 
     if request.method == 'POST':
         user_id = int(request.form['user_id'])
@@ -135,10 +178,10 @@ def likes(post_id):
         return jsonify(error=[{'error': 'Connection not achieved'}])
 
     
-@app.route('/api/users/register', methods=['GET', 'POST'])
+@app.route('/api/users/register', methods=["POST"])
 def register():
     form = RegisterForm()
-    if request.method == 'POST' and form.validate_on_submit():
+    if request.method == "POST" and form.validate_on_submit():
     
         print('here')
         username = form.username.data
@@ -183,7 +226,7 @@ def register():
 
 
 
-@app.route('/api/auth/login', methods = ['POST'])
+@app.route('/api/auth/login', methods=["POST"])
 def login(): 
     form = LoginForm()
     if request.method == "POST" and form.validate_on_submit() and form.username.data:
@@ -192,23 +235,32 @@ def login():
         password = form.password.data
 
         user = User.query.filter_by(username=username).first()
-        if user is not None and check_password_hash(user.password, password):
-            # get user id, load into session
-            login_user(user)
-            # remember to flash a message to the user
-            # flash('You have been logged in successfully.', 'success')
-        return jsonify(message=[{"message": 'You have been logged in successfully.'}])
+        
+        if user is not None: 
+            if check_password_hash(user.password, password):
+                # get user id, load into session
+                login_user(user)
+                # remember to flash a message to the user
+                # flash('You have been logged in successfully.', 'success')
+                # print(user.id)
+                payload = {'userid': user.id}
+                token = jwt.encode(payload, jwt_token, algorithm='HS256').decode('utf-8')
+                # data = {'token': token}, message = "Token Generated"
+                return jsonify(success = [{"token": token,"userid": user.id, "message": "User successfully logged in."}])
+            return jsonify(errors = [{"errors": "Password not a match"}])
+        return jsonify(errors=[{"errors": "Username already exists "}])  
     else:
         error_list = form_errors(form)
-        return jsonify(errors=[{"error message": 'Invalid username or password', 'errors': error_list}])
+        return jsonify(errors=[{'errors': error_list}])
 
 
 
 @app.route('/api/auth/logout', methods = ['GET'])
+@requires_auth
 @login_required
 def logout():
     logout_user()
-    flash('Unfortunately, you have been logged out.', 'danger')
+    return jsonify(message = [{'message': "You have been logged out successfully"}])
 
 @login_manager.user_loader
 def load_user(id):

@@ -2,6 +2,9 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
+from flask_cors import CORS
+from flask_jwt_extended import JWTManager, create_access_token
+
 
 
 UPLOAD_FOLDER = './app/static/uploads'
@@ -12,11 +15,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://project2:project2@localhos
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
 csrf = CSRFProtect(app)
-
+cors = CORS(app)
 
 db = SQLAlchemy(app)
+jwt = JWTManager(app)
 
-
+jwt_token = app.config['TOKEN_KEY'] = "3cc8464f0b2eef61bf0872ebf640505db394175ed8d314ab9f2d9e6eb27552ce"
 # Flask_Login login manager
 login_manager = LoginManager()
 login_manager.init_app(app)
