@@ -29,6 +29,7 @@ from datetime import datetime
   
 
 @app.route('/api/users/{user_id}/posts', methods=['GET', 'POST'])
+@requires_auth
 def userposts(user_id):
     form = PostForm()
     id = int(user_id)
@@ -41,7 +42,7 @@ def userposts(user_id):
             secure_file = secure_filename(photo.filename)
             photo.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_file))
             
-            new_post = Post(user_id, photo, caption)
+            new_post = Post(id, secure_file, caption)
             db.session.add(new_post)
             db.session.commit()
             return jsonify(response=[{"message": "Successfully created a new post"}])
@@ -51,38 +52,36 @@ def userposts(user_id):
         post_results = []
         followers_list = [0, 0]
         userdetail = User.query.filter_by(id=id).first()
-        user_posts = db.sesion.query(Post).filter_by(user_id=id).all()
+        user_posts = db.session.query(Post).filter_by(user_id=id).all()
         total_posts = len(user_posts)
         followers = Follow.query.filter_by(user_id=id).all()
         follow = len(followers)
         for follower in followers:
             followers_list.append(follower.user_id)
-        for user in user_posts:
-            post_results.append({'id': user.id, 
-                        'user_id': user.user_id,
-                        'photo': user.photo,
-                        'caption': user.caption,
-                      'created_on': user.created_on,
+        for user_post in user_posts:
+            post_results.append({'id': user_post.id, 
+                        'user_id': user_post.user_id,
+                        'photo': user_post.photo,
+                        'caption': user_post.caption,
+                      'created_on': user_post.created_on,
                        'likes': 0})
 
-        response = [{"id": user_id, "username": userdetail.username,
+        response = [{"id": user_id, 
+                    "username": userdetail.username,
                      "firstname": userdetail.first_name,
                      "lastname": userdetail.last_name,
                      "email": userdetail.email,
                      "location": userdetail.location,
-                     "biography": userdetail.biography,
-                     "profile_photo": userdetail.profile_photo,
+                     "biography": userdetail.bio,
+                     "profile_photo": userdetail.proPhoto,
                      "joined_on": userdetail.joined_on,
                      "posts": post_results,
                      "numpost": total_posts,
                      "numfollower": follow,
                      "follower": followers_list}]
-        # print(response)
-        return jsonify(post_results), jsonify(response)
+        return jsonify(posts = post_results, response = response)
     else:
         return jsonify(error=[{"errors": "Connection not achieved"}])
-
-
     
 
 

@@ -1,4 +1,5 @@
 /* Add your Application JavaScript */
+
 Vue.component('app-header', {
     template: `
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
@@ -43,12 +44,12 @@ const Home = Vue.component('home', {
     <div class ="d-flex align-content-center t m-4 "> 
         <div class = "d-flex flex-row align-content-center  h-50"> 
             <div class = " m-2 w-50" > 
-                <img class = "home-image border border-secondary " src="/static/uploads/bridge.jpg"/>
+                <img class = "home-image border border-secondary " src="../static/images/bridge.jpg"/>
             </div>
             
                 <div class = "card  col-md-5 " > 
                         <div class = "mb-5">
-                            <i class = "fas fa camera" > </i> <h3 class = "text-center mt-2 cursive">  <img src = "../static/uploads/camera.png" width = "20" height = "24" class = "pb-1 mr-2"> Photogram</h3>
+                            <i class = "fas fa camera" > </i> <h3 class = "text-center mt-2 cursive">  <img src = "../static/images/camera.png" width = "20" height = "24" class = "pb-1 mr-2"> Photogram</h3>
                             <hr>
                             
                             <p class = ""> Share photos of your favourite moments with friends, family and the world. </p>
@@ -316,7 +317,7 @@ const UserProfile = Vue.component('profile', {
                 <div class = "row">
                     <div class = "col-9 row">
                         <div class = "col-3 pr-3">
-                            <img src="/static/images/propic.png" alt="icon" height="180" width="200" class = "mb-3"> 
+                        <img :src="'../static/uploads/' + profilePic" alt="icon" height="180" width="200" class = "mb-3"> 
                         </div>
 
                         <div class = "col-8 pl-3 mt-3">
@@ -325,7 +326,7 @@ const UserProfile = Vue.component('profile', {
                             </div>
 
                             <div class = "location mt-3">
-                                {{location}}
+                                {{loctn}}
                             </div>
 
                             <div class = "membership">
@@ -373,16 +374,8 @@ const UserProfile = Vue.component('profile', {
             </div>
 
             <div class = "row">
-                <div class = "col-4">
-                    <img src="/static/images/bridge.jpg" height="350" width="350" class = ""> 
-                </div>
-
-                <div class = "col-4">
-                    <img src="/static/images/bridge.jpg" height="350" width="350" class = "">
-                </div>
-
-                <div class = "col-4">
-                    <img src="/static/images/bridge.jpg" height="350" width="350" class = "">
+                <div v-for="post in posts" class = "col-4">
+                    <img :src="'../static/uploads/' + post" height="350" width="350" class = ""> 
                 </div>
 
 
@@ -393,15 +386,44 @@ const UserProfile = Vue.component('profile', {
     ` ,
     data: function(){
         return {
-            username: 'Jane Doe',
-            location: 'Kingston, Ja',
-            membership: 'Jan 2020',
-            biography: 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
-            postNum: '93',
-            follNum: '239',
+            username: '',
+            loctn: '',
+            membership: '',
+            biography: '',
+            postNum: 0 ,
+            follNum: 0,
+            profilePic: '',
             posts: []
         }
+    }, 
+    methods: {
+        
+    },
+    created(){
+        let self = this;
+        fetch('http://localhost:8080/api/users/posts')
+        
+        // .then(response => response.text())      // for plain text   
+        // .then(text => console.log(text)) 
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (jsonResponse) {
+            console.log(jsonResponse);
+            self.username = jsonResponse[0].username;
+            self.loctn = jsonResponse[0].location;
+            self.membership = jsonResponse[0].joined_on;
+            self.biography = jsonResponse[0].biography;
+            self.postNum = jsonResponse[0].numpost;
+            self.follNum = jsonResponse[0].numfollower;
+            self.profilePic = jsonResponse[0].profile_photo;
+            self.posts = jsonResponse[0].posts
+        })  
+        .catch(function (error) {
+            console.log(error);
+        });
     }
+
 });
 
 
@@ -419,7 +441,10 @@ const router = new VueRouter({
 
         // { path: "/explore", component: Explore},
 
-        { path: "/users/{user_id}", component: UserProfile },
+        { path: "/users/{user_id}", component: UserProfile }, //doesn't work with user id
+
+        // { path: "/users", component: UserProfile },
+        
         
 
         // { path: "/posts/new", component: NewPost},
