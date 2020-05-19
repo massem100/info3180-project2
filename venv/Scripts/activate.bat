@@ -8,11 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-<<<<<<< HEAD
-set VIRTUAL_ENV=C:\Program Files\heroku\flasky\info3180-project2\venv
-=======
-set VIRTUAL_ENV=C:\Users\jkanj\Documents\1 UWI MONA 2019, 2020\Semester 2\INFO3180 Dynamic Web Development\info3180-project2\venv
->>>>>>> 96198f58c03b8f62989369f931a6953f5b77706b
+set VIRTUAL_ENV=C:\Users\Masse\Desktop\F\info3180-project2\venv
 
 if not defined PROMPT set PROMPT=$P$G
 

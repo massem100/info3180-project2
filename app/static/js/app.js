@@ -3,7 +3,7 @@
 Vue.component("app-header", {
   template: `
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
-      <a class="navbar-brand cursive" href="#"><i class="fas fa-camera"> <img src = "../static/uploads/camera.png" width = "20" height = "24" class = "pb-1 mr-2"> </i> Photogram </a>
+      <a class="navbar-brand cursive" href="#"><i class="fas fa-camera"> <img src = "/static/uploads/camera.png" width = "20" height = "24" class = "pb-1 mr-2"> </i> Photogram </a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -46,12 +46,12 @@ const Home = Vue.component("home", {
     <div class ="d-flex align-content-center t m-4 "> 
         <div class = "d-flex flex-row align-content-center  h-50"> 
             <div class = " m-2 w-50" > 
-                <img class = "home-image border border-secondary " src="../static/images/bridge.jpg"/>
+                <img class = "home-image border border-secondary " src="/static/uploads/bridge.jpg"/>
             </div>
             
                 <div class = "card  col-md-5 " > 
                         <div class = "mb-5">
-                            <i class = "fas fa camera" > </i> <h3 class = "text-center mt-2 cursive">  <img src = "../static/images/camera.png" width = "20" height = "24" class = "pb-1 mr-2"> Photogram</h3>
+                            <i class = "fas fa camera" > </i> <h3 class = "text-center mt-2 cursive">  <img src = "/static/uploads/camera.png" width = "20" height = "24" class = "pb-1 mr-2"> Photogram</h3>
                             <hr>
                             
                             <p class = ""> Share photos of your favourite moments with friends, family and the world. </p>
@@ -86,7 +86,7 @@ const Explore = Vue.component("explore", {
                       <!--place user profile image here-->
 
                       <div class="explore-card-pi">
-                          <img :src=" '/static/uploads/' + post.proPhoto"class="card-img-top" alt="..." width="30" height="30">
+                          <img :src=" '/static/uploads/' + post.proPhoto" class="card-img-top" alt="..." width="30" height="30">
                       </div>
 
                       <!-place username here-->
@@ -486,10 +486,10 @@ const UserProfile = Vue.component("profile", {
                 </div>
 
             </div>
-
+          
             <div class = "row">
                 <div v-for="post in posts" class = "col-4">
-                    <img :src="'../static/uploads/' + post" height="350" width="350" class = ""> 
+                    <img :src="'/static/uploads/' + post.photo" height="350" width="350" class = ""> 
                 </div>
 
 
@@ -497,50 +497,52 @@ const UserProfile = Vue.component("profile", {
     
        
         </div>
-    ` ,
-    data: function(){
-        return {
-            username: '',
-            loctn: '',
-            membership: '',
-            biography: '',
-            postNum: 0 ,
-            follNum: 0,
-            profilePic: '',
-            posts: []
-        }
-    }, 
-    methods: {
-        
-    },
-    created(){
-        let self = this;
-        fetch('http://localhost:8080/api/users/posts')
-        
-        // .then(response => response.text())      // for plain text   
-        // .then(text => console.log(text)) 
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (jsonResponse) {
-            console.log(jsonResponse);
-            self.username = jsonResponse[0].username;
-            self.loctn = jsonResponse[0].location;
-            self.membership = jsonResponse[0].joined_on;
-            self.biography = jsonResponse[0].biography;
-            self.postNum = jsonResponse[0].numpost;
-            self.follNum = jsonResponse[0].numfollower;
-            self.profilePic = jsonResponse[0].profile_photo;
-            self.posts = jsonResponse[0].posts
-        })  
-        .catch(function (error) {
-            console.log(error);
-        });
-    }
-
+    `,
+  data: function () {
+    return {
+      uid : localStorage.getItem('userid'),
+      user_details: [],
+      username: '',
+      loctn: '',
+      membership: '',
+      biography: '',
+      postNum: 0,
+      follNum: 0,
+      profilePic: '',
+      posts: [],
+    };
+  },
+  
+  created: function () {
+    let self = this;
+    let userid = self.uid;
+    fetch('/api/users/' + userid + '/posts', {
+      method: "GET",
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("token"),
+        "X-CSRFToken": token,
+      },
+      credentials: "same-origin",
+    })
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (jsonResponse) {
+        console.log(jsonResponse);
+        self.username = jsonResponse.response[0].username;
+        self.loctn = jsonResponse.response[0].location;
+        self.membership = jsonResponse.response[0].joined_on;
+        self.biography = jsonResponse.response[0].biography;
+        self.postNum = jsonResponse.response[0].numpost;
+        self.follNum = jsonResponse.response[0].numfollower;
+        self.profilePic = jsonResponse.response[0].profile_photo;
+        self.posts = jsonResponse.response[0].posts
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  },
 });
-
-
 const NewPost = Vue.component("new-post", {
   template: `
         <div> 
@@ -583,35 +585,42 @@ const NewPost = Vue.component("new-post", {
   `,
   data: function () {
     return {
-      id: 5,
+      id: localStorage.getItem('userid'),
+      
+      
     };
   },
   methods: {
     NewPost: function () {
       let self = this;
-      let post_form = document.getElementById("PostForm");
-      let form_data = new FormData(post_form);
-      let userid = "" + self.id;
-      fetch("api/users/" + { user_id } + "/posts", {
+      let postForm = document.getElementById("PostForm");
+      let form_data = new FormData(postForm);
+      let userid = self.id;
+      fetch('/api/users/'+ userid + '/posts', {
         method: "POST",
+        body: form_data,
         headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
+          "Authorization": "Bearer " + localStorage.getItem("token"),
           "X-CSRFToken": token,
         },
         credentials: "same-origin",
       })
-        .then(function (response) {
+        .then(function(response) {
           return response.json();
         })
         .then(function (jsonResponse) {
           console.log(jsonResponse);
           // add if statement
-          // self.$router.push('/explore')
+          self.$router.push('/explore')
           // self.
-        });
+        })
+      },
     },
-  },
+     
+
 });
+
+
 // Define Routes
 const router = new VueRouter({
   mode: "history",

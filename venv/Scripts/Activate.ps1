@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <#
 .Synopsis
 Activate a Python virtual environment for the current PowerShell session.
@@ -71,37 +70,43 @@ If present, do not remove this function from the global namespace for the
 session.
 
 #>
-=======
->>>>>>> 72961d28c19bdb0272294812dc6b0d62089f1243
 function global:deactivate ([switch]$NonDestructive) {
     # Revert to original values
-    if (Test-Path function:_OLD_VIRTUAL_PROMPT) {
-        copy-item function:_OLD_VIRTUAL_PROMPT function:prompt
-        remove-item function:_OLD_VIRTUAL_PROMPT
+
+    # The prior prompt:
+    if (Test-Path -Path Function:_OLD_VIRTUAL_PROMPT) {
+        Copy-Item -Path Function:_OLD_VIRTUAL_PROMPT -Destination Function:prompt
+        Remove-Item -Path Function:_OLD_VIRTUAL_PROMPT
     }
 
-    if (Test-Path env:_OLD_VIRTUAL_PYTHONHOME) {
-        copy-item env:_OLD_VIRTUAL_PYTHONHOME env:PYTHONHOME
-        remove-item env:_OLD_VIRTUAL_PYTHONHOME
+    # The prior PYTHONHOME:
+    if (Test-Path -Path Env:_OLD_VIRTUAL_PYTHONHOME) {
+        Copy-Item -Path Env:_OLD_VIRTUAL_PYTHONHOME -Destination Env:PYTHONHOME
+        Remove-Item -Path Env:_OLD_VIRTUAL_PYTHONHOME
     }
 
-    if (Test-Path env:_OLD_VIRTUAL_PATH) {
-        copy-item env:_OLD_VIRTUAL_PATH env:PATH
-        remove-item env:_OLD_VIRTUAL_PATH
+    # The prior PATH:
+    if (Test-Path -Path Env:_OLD_VIRTUAL_PATH) {
+        Copy-Item -Path Env:_OLD_VIRTUAL_PATH -Destination Env:PATH
+        Remove-Item -Path Env:_OLD_VIRTUAL_PATH
     }
 
-    if (Test-Path env:VIRTUAL_ENV) {
-        remove-item env:VIRTUAL_ENV
+    # Just remove the VIRTUAL_ENV altogether:
+    if (Test-Path -Path Env:VIRTUAL_ENV) {
+        Remove-Item -Path env:VIRTUAL_ENV
     }
 
-    if (!$NonDestructive) {
-        # Self destruct!
-        remove-item function:deactivate
+    # Just remove the _PYTHON_VENV_PROMPT_PREFIX altogether:
+    if (Get-Variable -Name "_PYTHON_VENV_PROMPT_PREFIX" -ErrorAction SilentlyContinue) {
+        Remove-Variable -Name _PYTHON_VENV_PROMPT_PREFIX -Scope Global -Force
+    }
+
+    # Leave deactivate function in the global namespace if requested:
+    if (-not $NonDestructive) {
+        Remove-Item -Path function:deactivate
     }
 }
 
-<<<<<<< HEAD
-=======
 <#
 .Description
 Get-PyVenvConfig parses the values from the pyvenv.cfg file located in the
@@ -173,7 +178,6 @@ if ($VenvDir) {
 else {
     Write-Verbose "VenvDir not given as a parameter, using parent directory name as VenvDir."
     $VenvDir = $VenvExecDir.Parent.FullName.TrimEnd("\\/")
-    $VenvDir = $VenvDir.Insert($VenvDir.Length, "/")
     Write-Verbose "VenvDir=$VenvDir"
 }
 
@@ -204,46 +208,43 @@ Write-Verbose "VenvDir='$VenvDir'"
 
 # Deactivate any currently active virtual environment, but leave the
 # deactivate function in place.
->>>>>>> 96198f58c03b8f62989369f931a6953f5b77706b
 deactivate -nondestructive
 
-$env:VIRTUAL_ENV="C:\Program Files\heroku\flasky\info3180-project2\venv"
+# Now set the environment variable VIRTUAL_ENV, used by many tools to determine
+# that there is an activated venv.
+$env:VIRTUAL_ENV = $VenvDir
 
-if (! $env:VIRTUAL_ENV_DISABLE_PROMPT) {
+if (-not $Env:VIRTUAL_ENV_DISABLE_PROMPT) {
+
+    Write-Verbose "Setting prompt to '$Prompt'"
+
     # Set the prompt to include the env name
     # Make sure _OLD_VIRTUAL_PROMPT is global
-    function global:_OLD_VIRTUAL_PROMPT {""}
-    copy-item function:prompt function:_OLD_VIRTUAL_PROMPT
+    function global:_OLD_VIRTUAL_PROMPT { "" }
+    Copy-Item -Path function:prompt -Destination function:_OLD_VIRTUAL_PROMPT
+    New-Variable -Name _PYTHON_VENV_PROMPT_PREFIX -Description "Python virtual environment prompt prefix" -Scope Global -Option ReadOnly -Visibility Public -Value $Prompt
+
     function global:prompt {
-        Write-Host -NoNewline -ForegroundColor Green '(venv) '
+        Write-Host -NoNewline -ForegroundColor Green "($_PYTHON_VENV_PROMPT_PREFIX) "
         _OLD_VIRTUAL_PROMPT
     }
 }
 
 # Clear PYTHONHOME
-if (Test-Path env:PYTHONHOME) {
-    copy-item env:PYTHONHOME env:_OLD_VIRTUAL_PYTHONHOME
-    remove-item env:PYTHONHOME
+if (Test-Path -Path Env:PYTHONHOME) {
+    Copy-Item -Path Env:PYTHONHOME -Destination Env:_OLD_VIRTUAL_PYTHONHOME
+    Remove-Item -Path Env:PYTHONHOME
 }
 
 # Add the venv to the PATH
-<<<<<<< HEAD
-copy-item env:PATH env:_OLD_VIRTUAL_PATH
-$env:PATH = "$env:VIRTUAL_ENV\Scripts;$env:PATH"
-=======
 Copy-Item -Path Env:PATH -Destination Env:_OLD_VIRTUAL_PATH
 $Env:PATH = "$VenvExecDir$([System.IO.Path]::PathSeparator)$Env:PATH"
 
 # SIG # Begin signature block
 # MIIaVgYJKoZIhvcNAQcCoIIaRzCCGkMCAQExDzANBglghkgBZQMEAgEFADB5Bgor
 # BgEEAYI3AgEEoGswaTA0BgorBgEEAYI3AgEeMCYCAwEAAAQQH8w7YFlLCE63JNLG
-<<<<<<< HEAD
 # KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCB4FjjwuGJ5gSL0
 # iL6S7lcEZZkUeR8WmjwNHaW4JFCdraCCFBgwggPuMIIDV6ADAgECAhB+k+v7fMZO
-=======
-# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCDq2sTPEIJ8JE5n
-# msRhacE7nmlm6ccumO/BwpdDqNYl5KCCFBgwggPuMIIDV6ADAgECAhB+k+v7fMZO
->>>>>>> 72961d28c19bdb0272294812dc6b0d62089f1243
 # WepLmnfUBvw7MA0GCSqGSIb3DQEBBQUAMIGLMQswCQYDVQQGEwJaQTEVMBMGA1UE
 # CBMMV2VzdGVybiBDYXBlMRQwEgYDVQQHEwtEdXJiYW52aWxsZTEPMA0GA1UEChMG
 # VGhhd3RlMR0wGwYDVQQLExRUaGF3dGUgQ2VydGlmaWNhdGlvbjEfMB0GA1UEAxMW
@@ -355,7 +356,6 @@ $Env:PATH = "$VenvExecDir$([System.IO.Path]::PathSeparator)$Env:PATH"
 # EHd3dy5kaWdpY2VydC5jb20xMTAvBgNVBAMTKERpZ2lDZXJ0IFNIQTIgQXNzdXJl
 # ZCBJRCBDb2RlIFNpZ25pbmcgQ0ECEAM+1e2gZdG4yR38+Spsm9gwDQYJYIZIAWUD
 # BAIBBQCggdAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGCNwIB
-<<<<<<< HEAD
 # CzEOMAwGCisGAQQBgjcCARUwLwYJKoZIhvcNAQkEMSIEIPNbsYAL3juaSl9Roa7m
 # dLCGeSOJmm7EQN82IOS7MbKgMGQGCisGAQQBgjcCAQwxVjBUoFKAUABCAHUAaQBs
 # AHQAOgAgAFIAZQBsAGUAYQBzAGUAXwBtAGEAcwB0AGUAcgBfAHYAMwAuADgALgAz
@@ -382,33 +382,4 @@ $Env:PATH = "$VenvExecDir$([System.IO.Path]::PathSeparator)$Env:PATH"
 # 4ccPlA9HJq3afqsa98IJOyo8QhaVeKwP7w9jE2gPKndfc02oRI7y5qiI7+/jT1Iy
 # smmUsl9VxIhPSsinxuwbypy/bTcGFYPrO6nciLrvrQajYjOeiz4geYcbHMGtNHfD
 # q+pqvBqD3fe0YICRI775km7P4AYxGPKZBW4=
-=======
-# CzEOMAwGCisGAQQBgjcCARUwLwYJKoZIhvcNAQkEMSIEIDwkNFE0J7lFqDFWlO8g
-# a0Vg8TqicqZe2fbuhTmOCdCDMGQGCisGAQQBgjcCAQwxVjBUoFKAUABCAHUAaQBs
-# AHQAOgAgAFIAZQBsAGUAYQBzAGUAXwBtAGEAcwB0AGUAcgBfAHYAMwAuADgALgAx
-# AF8AMgAwADEAOQAxADIAMQA4AC4AMAAxMA0GCSqGSIb3DQEBAQUABIICACbwmgd+
-# doVwLf3DbJEz47aQT3LANL6bGZ3AfE192LY2+l3aO125tMGK0NdnrU3F7oTRTIrF
-# sdOm2+OstYBdLbB48RGYslZmPbxQu7u4QBBBi/YhggMLlokM9JL+8HM8SqLRiG76
-# 0B/ilq9T1MteBnft14afBSleIpgB+ce0VKNL8gPGORWvnd6A/smkkquhPlmBDUvG
-# wX8qZFHS6qywahdOwANMviQpswQ3YUG5jWXi8AX6GNeWnxXx6Asx5f//74Gqo6a7
-# OFA/VmmsVaEuTyDF7ll+GlrGn77T9bcgk5KaaVv6dxrbgaik49I7Qa1nGSvVHwjX
-# XB652tpfHxXnajO7Qz3w3iOOddAanVTIEcQDbCejtSiqgcKPE1R2+c+wJ1HRaKZ7
-# yM77l1s8gK8zKi9xUdvASWiFiJ2An5FcenkjTg3adAmhmIPkNwVvSZmUdRLPXAxf
-# Y/H0y+8IEblQ4MfbV4tuc//gI/hrgfTlfq2/45KG0TQ7/iPwSmEcBQFKBixF5bxS
-# 6u9kpB7pj2N9A8J2ttWnC5qVxTd7PH+pTy0vSEpXlRQCb7++jjJfroPWbJM+/X1g
-# 5PRl5f0Ya1hpYxy56yBz2bBANoVuaFfDWDPmcBKva7Hqgw/OI3vZu3RqCs7HXdGw
-# tf7bFzEMYKzgmDnb90ouWZAR9q5PzB5VGtA7oYICCzCCAgcGCSqGSIb3DQEJBjGC
-# AfgwggH0AgEBMHIwXjELMAkGA1UEBhMCVVMxHTAbBgNVBAoTFFN5bWFudGVjIENv
-# cnBvcmF0aW9uMTAwLgYDVQQDEydTeW1hbnRlYyBUaW1lIFN0YW1waW5nIFNlcnZp
-# Y2VzIENBIC0gRzICEA7P9DjI/r81bgTYapgbGlAwCQYFKw4DAhoFAKBdMBgGCSqG
-# SIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE5MTIxODIzMTcx
-# MlowIwYJKoZIhvcNAQkEMRYEFH0jwh7PemYBuyfNXIYTFCAb+YspMA0GCSqGSIb3
-# DQEBAQUABIIBAElndo5LcPp3QeHraYmNpNphu0C2yEvJkknWL7BrO0bC2q2q+C/e
-# HtRIX8F8nh/2q4MBUzH1pKY+KUdJlP47R6vgOfGtOPcAwFWuevZYDZe6YDATLXvK
-# Qdysm/Fm9DSM3HesLRkEthtzNVQxMjO+/1AQb6I4/dvJrmUyVE67m1L5S7B8Ezot
-# Y0MQdjZDUMV2tSwLoUnddBkQG3PxPkJoZlpC54rzVKOuoXUUOpvjLau9EAsIUH2K
-# S7IwltXcdLL/GY2g3Sto8Jqyjl1Qcky4FqBGH3tyaNOtLl31uDZlDpbttLnZQKWf
-# CIKBmWknNrTzvZuH8fZcLiNY7dobJicoWEY=
->>>>>>> 72961d28c19bdb0272294812dc6b0d62089f1243
 # SIG # End signature block
->>>>>>> 96198f58c03b8f62989369f931a6953f5b77706b

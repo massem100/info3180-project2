@@ -16,6 +16,7 @@ from app.models import User, Post, Like, Follow
 from datetime import datetime
 from functools import wraps
 import jwt
+from sqlalchemy import desc
 
 
 # Create a JWT @requires_auth decorator
@@ -105,7 +106,7 @@ def userposts(user_id):
                      "numpost": total_posts,
                      "numfollower": follow,
                      "follower": followers_list}]
-        return jsonify(posts = post_results, response = response)
+        return jsonify( response = response)
     else:
         return jsonify(error=[{"errors": "Connection not achieved"}])
     
@@ -149,7 +150,7 @@ def all_posts():
     if request.method == 'GET':
         post_list = []
         
-        user_posts = Post.query.order_by(Post.created_on).all()
+        user_posts = Post.query.order_by(desc(Post.created_on)).all()
         # print(user_posts)
         for post in user_posts:
             userinfo = User.query.filter_by(id=post.user_id).first()
@@ -163,8 +164,8 @@ def all_posts():
                                 'created_on': post.created_on,
                                 'likes': likes})
         
-        sorted_posts = sorted(post_list, key=lambda i: (post_list[0]['created_on']), reverse=True)
-        return jsonify (response=[{'posts': sorted_posts}])
+        
+        return jsonify (response=[{'posts': post_list}])
     return jsonify (errors=[{'error': 'No Connection '}])
 
 @app.route('/api/posts/{post_id}/like', methods = ['POST'])
