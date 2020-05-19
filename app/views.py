@@ -106,9 +106,8 @@ def userposts(user_id):
                      "numfollower": follow,
                      "follower": followers_list}]
         return jsonify(posts = post_results, response = response)
-    
-
-
+    else:
+        return jsonify(error=[{"errors": "Connection not achieved"}])
     
 
 
