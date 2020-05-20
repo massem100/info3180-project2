@@ -3,7 +3,7 @@
 Vue.component("app-header", {
   template: `
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
-      <a class="navbar-brand cursive" href="#"><i class="fas fa-camera"> <img src = "/static/uploads/camera.png" width = "20" height = "24" class = "pb-1 mr-2"> </i> Photogram </a>
+      <a class="navbar-brand cursive" href="#"><i class="fas fa-camera"> </i> Photogram </a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -102,7 +102,9 @@ const Explore = Vue.component("explore", {
 
                   <div class="card-footer" style="background-color: white;">
                       <div class="float-left">
-                      <p> <i class = "fas fa camera" ></i><strong>{{post.likes}} likes</strong></p> 
+                      <div class = "d-flex flex-rpwfont-weight-bold" :id="post.id"> 
+                         <i class = "fas fa-heart m-1" @click ="Like_post(post.id)"></i> <span>{{post.likes}} Likes</span>
+                      </div> 
                       </div>
 
                       <!--place date here-->
@@ -126,9 +128,55 @@ const Explore = Vue.component("explore", {
     `,
   data: function () {
     return {
+      id: localStorage.getItem("userid"),
       posts: [],
       errors: [],
     };
+  },
+  methods: {
+    Like_post: function(post_id) {
+
+      let self = this; 
+      let postid = ""+post_id;
+      let userid = ""+self.id;
+      let form_data = new FormData();
+      form_data.append("user_id",userid); 
+      form_data.append("post_id",postid);
+      fetch('/api/posts/' + postid +'/like', {
+        method: "POST", 
+        body: form_data,
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem('token'), 
+          "X-CSRFToken": token, 
+        }, 
+        credentials: "same-origin",
+
+      })
+      .then(function (response){
+        return response.json();
+      })
+      .then(function(jsonResponse){
+        console.log(jsonResponse);
+        if (jsonResponse.response["0"].message == "Post liked already!"){
+
+          let icon = document.getElementById(post_id).childNodes["0"]; 
+          icon.classList.remove("fas");
+          icon.classList.add("far");
+        }else if (jsonResponse.response["0"].message == "Post liked!"){
+          let icon = document.getElementById(post_id).childNodes["0"];
+          icon.classList.add("fas");
+          icon.classList.remove("far");
+          let new_like = document.getElementById(post_id).childNodes["2"].textContent = jsonResponse.response["0"].likes + ' Likes'; 
+          // console.log(new_like);
+        
+        }    
+      })
+      .catch( function(error){
+        console.log(error);
+      });
+
+    },
+
   },
   created: function () {
     let self = this;
@@ -410,15 +458,13 @@ const Logout = Vue.component("logout", {
         // display a success message
         //console.log(jsonResponse);
         if (
-          jsonResponse.response["0"].message ==
-          "You have been logged out successfully"
-        ) {
+          jsonResponse.message["0"].message =="You have been logged out successfully") {
           localStorage.removeItem("token");
           localStorage.removeItem("userid");
           let message = "You have been logged out ";
           let logout = document.getElementById("Logout");
-          logout.classList.add("hide-display");
-          // self.$router.push('/');
+          // logout.classList.add("hide-display");
+          self.$router.push('/');
         }
       })
       .catch(function (error) {
@@ -596,6 +642,7 @@ const NewPost = Vue.component("new-post", {
       let postForm = document.getElementById("PostForm");
       let form_data = new FormData(postForm);
       let userid = self.id;
+      form_data.append("userid",userid);
       fetch('/api/users/'+ userid + '/posts', {
         method: "POST",
         body: form_data,

@@ -55,6 +55,7 @@ def requires_auth(f):
 
 @app.route('/api/users/<user_id>/posts', methods=["POST", "GET"])
 @requires_auth
+@login_required
 def userposts(user_id):
     form = PostForm()
     id = user_id
@@ -114,6 +115,7 @@ def userposts(user_id):
 
 @app.route('/api/users/{user_id}/follow',  methods=['POST'])
 @requires_auth
+@login_required
 def follow(user_id):
     if request.method == 'POST':
         current_user = int(request.form['follower_id'])
@@ -145,6 +147,7 @@ def follow(user_id):
 
 @app.route('/api/posts', methods = ['GET'])
 @requires_auth
+@login_required
 def all_posts():
 
     if request.method == 'GET':
@@ -168,17 +171,26 @@ def all_posts():
         return jsonify (response=[{'posts': post_list}])
     return jsonify (errors=[{'error': 'No Connection '}])
 
-@app.route('/api/posts/{post_id}/like', methods = ['POST'])
+@app.route('/api/posts/<post_id>/like', methods = ['POST'])
 @requires_auth
+@login_required
 def likes(post_id): 
     if request.method == 'POST':
         user_id = int(request.form['user_id'])
-        post = int(request.form['post_id'])
-        like = Like(user_id, post)
-        db.session.add(like)
-        db.session.commit()
-        total = len(Like.query.filter_by(post_id=post).all())
-        return jsonify(response=[{'message': 'Post liked!', 'likes': total}])
+        postid = int(request.form['post_id'])
+
+        get_likes = Like.query.filter_by(post_id=postid, user_id =user_id).all()
+        print(get_likes)
+        if len(get_likes)>= 1: 
+            Like.query.filter_by(post_id=postid, user_id=user_id).delete()
+            total = len(Like.query.filter_by(post_id=postid).all())
+            return jsonify(response=[{'message': 'Post liked already!', 'likes': total}])
+        else:
+            like = Like(user_id, postid)
+            db.session.add(like)
+            db.session.commit()
+            total = len(Like.query.filter_by(post_id=postid).all())
+            return jsonify(response=[{'message': 'Post liked!', 'likes': total}])
     else:
         return jsonify(error=[{'error': 'Connection not achieved'}])
 
