@@ -90,7 +90,7 @@ const Explore = Vue.component("explore", {
                       </div>
 
                       <!-place username here-->
-                      <p class="explore-card-username" ><a href="#" ><strong>{{post.username}}</strong></a></p>
+                      <p class="explore-card-username" ><a  @click="get_profile(post.user_id)" ><strong>{{post.username}}</strong></a></p>
                   </div>
                   <img :src=" '/static/uploads/' + post.photo" class="card-img-top explore-card-postimg" alt="..." >
 
@@ -134,6 +134,12 @@ const Explore = Vue.component("explore", {
     };
   },
   methods: {
+    get_profile: function (link_user) {
+      let self = this;
+      let uid = "" +  link_user;
+      console.log(uid);
+      self.$router.push("/users/" + uid);
+    },
     Like_post: function(post_id) {
 
       let self = this; 
@@ -575,14 +581,15 @@ const UserProfile = Vue.component("profile", {
       })
       .then(function (jsonResponse) {
         console.log(jsonResponse);
-        self.username = jsonResponse.response[0].username;
-        self.loctn = jsonResponse.response[0].location;
-        self.membership = jsonResponse.response[0].joined_on;
-        self.biography = jsonResponse.response[0].biography;
-        self.postNum = jsonResponse.response[0].numpost;
-        self.follNum = jsonResponse.response[0].numfollower;
-        self.profilePic = jsonResponse.response[0].profile_photo;
-        self.posts = jsonResponse.response[0].posts
+        self.userid = jsonResponse.response["0"].id;
+        self.username = jsonResponse.response["0"].username;
+        self.loctn = jsonResponse.response["0"].location;
+        self.membership = jsonResponse.response["0"].joined_on;
+        self.biography = jsonResponse.response["0"].biography;
+        self.postNum = jsonResponse.response["0"].numpost;
+        self.follNum = jsonResponse.response["0"].numfollower;
+        self.profilePic = jsonResponse.response["0"].profile_photo;
+        self.posts = jsonResponse.response["0"].posts;
       })
       .catch(function (error) {
         console.log(error);
