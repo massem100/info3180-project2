@@ -113,7 +113,7 @@ def userposts(user_id):
     
 
 
-@app.route('/api/users/{user_id}/follow',  methods=['POST'])
+@app.route('/api/users/<user_id>/follow',  methods=['POST'])
 @requires_auth
 @login_required
 def follow(user_id):
@@ -133,16 +133,14 @@ def follow(user_id):
 
             user = User.query.filter_by(id=target_user).first()
             follow_total = len(Follow.query.filter_by(user_id=target_user).all())
-            return jsonify(response=[{"message": "You are now following that user." + user.username, "followers": follow_total}])
+            return jsonify(response=[{"message": "You are now following that user." , "followers": follow_total}])
         else:
             follow_total = len(Follow.query.filter_by(user_id=target_user).all())
             return jsonify(response=[{"message": "You are already following that user.", "followers": follow_total}])
     else:
         return jsonify(errors=[{'error': 'Connection not achieved'}])
 
-    if request.method == 'GET':
-        follow_total = len(Follow.query.filter_by(user_id=target_user).all())
-        return jsonify([{"followers" : follow_total}])
+    
 
 
 @app.route('/api/posts', methods = ['GET'])
@@ -181,7 +179,7 @@ def likes(post_id):
 
         get_likes = Like.query.filter_by(post_id=postid, user_id =user_id).all()
         print(get_likes)
-        if len(get_likes)>= 1: 
+        if len(get_likes)>0: 
             Like.query.filter_by(post_id=postid, user_id=user_id).delete()
             total = len(Like.query.filter_by(post_id=postid).all())
             return jsonify(response=[{'message': 'Post liked already!', 'likes': total}])
@@ -235,7 +233,7 @@ def register():
             db.session.add(user)
             db.session.commit()
                                     
-        return jsonify([{'message': 'Successfully registered'}])
+        return jsonify(success =[{'message': 'Successfully registered'}])
     else: 
         error_list = form_errors(form)
         error = [{'errors': error_list}]

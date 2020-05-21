@@ -17,7 +17,7 @@ Vue.component("app-header", {
             <router-link class="nav-link" to="/explore">Explore<span class="sr-only">(current)</span></router-link>
           </li>
           <li class="nav-item active">
-            <router-link class="nav-link" to="/users/:user_id"> My Profile <span class="sr-only">(current)</span></router-link>
+            <router-link class="nav-link" to="'/users/' + {userid}"> My Profile <span class="sr-only">(current)</span></router-link>
           </li>
           <li class="nav-item active">
             <router-link id = "Logout" class="nav-link" to="/logout">Logout<span class="sr-only">(current)</span></router-link>
@@ -27,8 +27,12 @@ Vue.component("app-header", {
     </nav>
     `,
   data: function () {
-    return {};
+    return {
+      userid: localStorage.getItem('userid'),
+      
+    };
   },
+  
 });
 
 Vue.component("app-footer", {
@@ -136,9 +140,9 @@ const Explore = Vue.component("explore", {
   methods: {
     get_profile: function (link_user) {
       let self = this;
-      let uid = "" +  link_user;
-      console.log(uid);
-      self.$router.push("/users/" + uid);
+      userid = "" +  link_user;
+      // console.log(uid);
+      self.$router.push("/users/" + userid);
     },
     Like_post: function(post_id) {
 
@@ -182,6 +186,7 @@ const Explore = Vue.component("explore", {
       });
 
     },
+    
 
   },
   created: function () {
@@ -328,21 +333,21 @@ const Register = Vue.component("register", {
         },
         credentials: "same-origin",
       })
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (jsonResponse) {
-          // display a success message
-          console.log(jsonResponse);
-          if (jsonResponse.success["0"].message == "Successfully registered") {
-          }
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (jsonResponse) {
+        // display a success message
+        console.log(jsonResponse);
+        if (jsonResponse.success["0"].message == "Successfully registered") {
           self.success = jsonResponse.success;
           self.errors = jsonResponse.errors;
-          self.$router.push('/login')
+          self.$router.push('/login');
+        }
         })
-        .catch(function (error) {
-          console.log(error);
-        });
+      .catch(function (error) {
+        console.log(error);
+      });
     },
   },
 });
@@ -415,10 +420,10 @@ const Login = Vue.component("login", {
           // self.success = jsonResponse.success;
           // self.errors = jsonResponse.errors;
           if (jsonResponse.success != null) {
-            let userid = jsonResponse.success["0"].userid;
+            let localuserid = jsonResponse.success["0"].userid;
             let jwt_token = jsonResponse.success["0"].token;
             localStorage.setItem("token", jwt_token);
-            localStorage.setItem("userid", userid);
+            localStorage.setItem("userid", localuserid);
             console.info("Token generated and added to localStorage.");
             self.token = jwt_token;
             self.$router.push("/explore");
@@ -463,15 +468,13 @@ const Logout = Vue.component("logout", {
       .then(function (jsonResponse) {
         // display a success message
         //console.log(jsonResponse);
-        if (
-          jsonResponse.message["0"].message =="You have been logged out successfully") {
-          localStorage.removeItem("token");
           localStorage.removeItem("userid");
+          localStorage.removeItem("token");          
           let message = "You have been logged out ";
           let logout = document.getElementById("Logout");
           // logout.classList.add("hide-display");
           self.$router.push('/');
-        }
+
       })
       .catch(function (error) {
         // console.log(error);
@@ -510,7 +513,7 @@ const UserProfile = Vue.component("profile", {
 
                     <div class = "col-3 mt-3 row center">
                         <div class = "col-6"> 
-                            <div class = "post-follow-num">
+                            <div class = "post-follow-num" >
                                 {{postNum}}
                             </div>
                             <div class = "post-follow-label">
@@ -520,7 +523,7 @@ const UserProfile = Vue.component("profile", {
 
 
                         <div class = "col-6">
-                            <div class = "post-follow-num">
+                            <div class = "post-follow-num" id = "Follow_num">
                                 {{follNum}}
                             </div>
                             <div class = "post-follow-label">
@@ -529,7 +532,7 @@ const UserProfile = Vue.component("profile", {
                         </div>
 
                         <div class = "wt-lrg">
-                            <button class="btn btn-primary ml-2 btn-width">
+                            <button id = "Follow" @click="Follow(userid)" class="btn btn-primary ml-2 btn-width">
                                 Follow
                             </button>
                         </div>
@@ -552,7 +555,7 @@ const UserProfile = Vue.component("profile", {
     `,
   data: function () {
     return {
-      uid : localStorage.getItem('userid'),
+      userid: '',
       user_details: [],
       username: '',
       loctn: '',
@@ -565,10 +568,11 @@ const UserProfile = Vue.component("profile", {
     };
   },
   
-  created: function () {
+  created: function (userid) {
     let self = this;
-    let userid = self.uid;
-    fetch('/api/users/' + userid + '/posts', {
+    let uid = self.$route.params.userid;
+    console.log(self.$route.params.userid);
+    fetch('/api/users/' + uid + '/posts', {
       method: "GET",
       headers: {
         "Authorization": "Bearer " + localStorage.getItem("token"),
@@ -595,6 +599,50 @@ const UserProfile = Vue.component("profile", {
         console.log(error);
       });
   },
+  methods: {
+    Follow: function (userid) {
+      let self = this;
+      let logged_in_user = localStorage.getItem('userid');
+      let form_data = new FormData();
+      let idParam = "" + userid;
+      form_data.append("user_id", logged_in_user);
+      form_data.append("follower_id", idParam);
+
+      fetch("/api/users/" + userid + "/follow", {
+        method: 'POST',
+        body: form_data,
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('token'),
+          'X-CSRFToken': token
+        },
+        credentials: 'same-origin'
+      })
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (jsonResponse) {
+          // display a success message
+          console.log(jsonResponse);
+          if (jsonResponse.response["0"].message == "You are now following that user."){
+            console.log("SSS");
+            let f_button = document.getElementById('Follow').innerText = "Following";
+            
+            f_button.classList.remove('btn-primary');
+            f_button.classList.add('green');
+            let new_follow = document.getElementById(follow_num).textContent = jsonResponse.response["0"].followers;
+          }else{
+            let f_btn = document.getElementById('follow').innerHTML = jsonResponse.response['0'].follow;
+            
+             }
+        
+          
+        })
+        .catch(function (error) {
+          //console.log(error);
+        });
+    }
+  }
+  
 });
 const NewPost = Vue.component("new-post", {
   template: `
@@ -689,7 +737,7 @@ const router = new VueRouter({
 
     { path: "/explore", component: Explore },
 
-    { path: "/users/:userid", component: UserProfile },
+    { path: "/users/:userid", name: 'UserProfile', component: UserProfile },
 
     { path: "/posts/new", component: NewPost },
 
@@ -703,4 +751,9 @@ const router = new VueRouter({
 let app = new Vue({
   el: "#app",
   router,
+  data: function () {
+    return{ 
+      userid: '',
+    }
+  }
 });
