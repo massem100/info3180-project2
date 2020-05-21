@@ -179,16 +179,11 @@ def likes(post_id):
 
         get_likes = Like.query.filter_by(post_id=postid, user_id =user_id).all()
         print(get_likes)
-        if len(get_likes)>0: 
-            Like.query.filter_by(post_id=postid, user_id=user_id).delete()
-            total = len(Like.query.filter_by(post_id=postid).all())
-            return jsonify(response=[{'message': 'Post liked already!', 'likes': total}])
-        else:
-            like = Like(user_id, postid)
-            db.session.add(like)
-            db.session.commit()
-            total = len(Like.query.filter_by(post_id=postid).all())
-            return jsonify(response=[{'message': 'Post liked!', 'likes': total}])
+        like = Like(user_id, postid)
+        db.session.add(like)
+        db.session.commit()
+        total = len(Like.query.filter_by(post_id=postid).all())
+        return jsonify(response=[{'message': 'Post liked!', 'likes': total}])
     else:
         return jsonify(error=[{'error': 'Connection not achieved'}])
 

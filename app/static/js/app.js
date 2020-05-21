@@ -605,8 +605,8 @@ const UserProfile = Vue.component("profile", {
       let logged_in_user = localStorage.getItem('userid');
       let form_data = new FormData();
       let idParam = "" + userid;
-      form_data.append("user_id", logged_in_user);
-      form_data.append("follower_id", idParam);
+      form_data.append("user_id", idParam);
+      form_data.append("follower_id", logged_in_user);
 
       fetch("/api/users/" + userid + "/follow", {
         method: 'POST',
@@ -622,16 +622,17 @@ const UserProfile = Vue.component("profile", {
         })
         .then(function (jsonResponse) {
           // display a success message
-          console.log(jsonResponse);
+          // console.log(jsonResponse);
           if (jsonResponse.response["0"].message == "You are now following that user."){
-            console.log("SSS");
-            let f_button = document.getElementById('Follow').innerText = "Following";
             
+            let f_button = document.getElementById('Follow');
+            f_button.innerText ="Following";
             f_button.classList.remove('btn-primary');
             f_button.classList.add('green');
-            let new_follow = document.getElementById(follow_num).textContent = jsonResponse.response["0"].followers;
+            f_button.classList.add('text-white');
+            let new_follow = document.getElementById(Follow_num).textContent = jsonResponse.response["0"].followers;
           }else{
-            let f_btn = document.getElementById('follow').innerHTML = jsonResponse.response['0'].follow;
+            let f_btn = document.getElementById('follow').innerHTML = jsonResponse.response['0'].followers;
             
              }
         
