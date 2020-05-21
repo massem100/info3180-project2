@@ -178,7 +178,7 @@ def likes(post_id):
         postid = int(request.form['post_id'])
 
         get_likes = Like.query.filter_by(post_id=postid, user_id =user_id).all()
-        print(get_likes)
+        # print(get_likes)
         like = Like(user_id, postid)
         db.session.add(like)
         db.session.commit()
@@ -193,7 +193,7 @@ def register():
     form = RegisterForm()
     if request.method == "POST" and form.validate_on_submit():
     
-        print('here')
+        # print('here')
         username = form.username.data
         password = form.password.data
         first_name = form.first_name.data

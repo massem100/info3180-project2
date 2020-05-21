@@ -1,5 +1,4 @@
 /* Add your Application JavaScript */
-
 Vue.component("app-header", {
   template: `
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
@@ -17,7 +16,7 @@ Vue.component("app-header", {
             <router-link class="nav-link" to="/explore">Explore<span class="sr-only">(current)</span></router-link>
           </li>
           <li class="nav-item active">
-            <router-link class="nav-link" to="'/users/' + {userid}"> My Profile <span class="sr-only">(current)</span></router-link>
+            <router-link class="nav-link" :to="{ name: 'UserProfile', params: { userid:$root.userid }}"> My Profile <span class="sr-only">(current)</span></router-link>
           </li>
           <li class="nav-item active">
             <router-link id = "Logout" class="nav-link" to="/logout">Logout<span class="sr-only">(current)</span></router-link>
@@ -28,7 +27,7 @@ Vue.component("app-header", {
     `,
   data: function () {
     return {
-      userid: localStorage.getItem('userid'),
+      
       
     };
   },
@@ -82,6 +81,23 @@ const Home = Vue.component("home", {
 const Explore = Vue.component("explore", {
   template: `
       <div class="container">
+        <div> 
+
+  
+                
+        <ul v-for = "error in errors" class="list alert alert-danger d-flex flex-column"> 
+            <li class = "ml-3" > 
+                  {{error.errors[0]}} 
+            </li>
+                                        
+            <li class = "ml-3">
+                    {{error.errors[1]}}    
+               
+            </li>
+
+        </ul> 
+      </div>
+        
           <div class="row explore-card">
             <div class="col-md-9">
               <div class="card explore-card-btm mb-3  explore-card-group" v-for= "post in posts" >
@@ -107,7 +123,7 @@ const Explore = Vue.component("explore", {
                   <div class="card-footer" style="background-color: white;">
                       <div class="float-left">
                       <div class = "d-flex flex-rpwfont-weight-bold" :id="post.id"> 
-                         <i class = "fas fa-heart m-1" @click ="Like_post(post.id)"></i> <span>{{post.likes}} Likes</span>
+                         <i class = "far fa-heart m-1" @click ="Like_post(post.id)"></i> <span>{{post.likes}} Likes</span>
                       </div> 
                       </div>
 
@@ -166,23 +182,19 @@ const Explore = Vue.component("explore", {
         return response.json();
       })
       .then(function(jsonResponse){
-        console.log(jsonResponse);
-        if (jsonResponse.response["0"].message == "Post liked already!"){
-
-          let icon = document.getElementById(post_id).childNodes["0"]; 
-          icon.classList.remove("fas");
-          icon.classList.add("far");
-        }else if (jsonResponse.response["0"].message == "Post liked!"){
+        // console.log(jsonResponse);
+        
+        if (jsonResponse.response["0"].message == "Post liked!"){
           let icon = document.getElementById(post_id).childNodes["0"];
           icon.classList.add("fas");
-          icon.classList.remove("far");
+
           let new_like = document.getElementById(post_id).childNodes["2"].textContent = jsonResponse.response["0"].likes + ' Likes'; 
           // console.log(new_like);
         
         }    
       })
       .catch( function(error){
-        console.log(error);
+        // console.log(error);
       });
 
     },
@@ -203,12 +215,12 @@ const Explore = Vue.component("explore", {
         return response.json();
       })
       .then(function (jsonResponse) {
-        console.log(jsonResponse);
+        // console.log(jsonResponse);
         self.posts = jsonResponse.response["0"].posts;
         self.errors = jsonResponse.errors;
       })
       .catch(function (error) {
-        console.log(error);
+        // console.log(error);
       });
   },
 });
@@ -229,22 +241,17 @@ const Register = Vue.component("register", {
       <div class = "d-flex flex-column align-items-center">
             <h4 class = "font-weight-bold "> Register </h4>
             <div class = "m-2"> 
-                        <ul v-for= "data in success" class="list alert alert-success"> 
-                                {{data.message}}
-                        
-                        </ul>
-                        
-                        <ul v-for = "error in errors" class="list alert alert-danger d-flex flex-column"> 
-                            <li class = "ml-3" > 
-                                {{error.errors[0]}} 
-                            </li>
-                                                        
-                            <li class = "ml-3">
-                                    {{error.errors[1]}}    
-                            
-                            </li>
-
-                        </ul> 
+                <ul v-for= "data in success" class="list alert alert-success"> 
+                        {{message}}                        
+                </ul>
+                
+                <ul v-for = "error in error_list" class="list alert alert-danger d-flex flex-column"> 
+                    <li class = "ml-3" > 
+                        {{error}} 
+                    </li>
+                                                
+                    
+                </ul> 
                 </div>
             <div class = "card w-50 h-60 d-flex flex-column m-2 border rounded">
                 
@@ -317,7 +324,7 @@ const Register = Vue.component("register", {
   data: function () {
     return {
       success: [],
-      errors: [],
+      error_list: [],
     };
   },
   methods: {
@@ -338,15 +345,15 @@ const Register = Vue.component("register", {
       })
       .then(function (jsonResponse) {
         // display a success message
-        console.log(jsonResponse);
+        // console.log(jsonResponse);
         if (jsonResponse.success["0"].message == "Successfully registered") {
           self.success = jsonResponse.success;
-          self.errors = jsonResponse.errors;
+          self.error_list = jsonResponse.errors["0"];
           self.$router.push('/login');
         }
         })
       .catch(function (error) {
-        console.log(error);
+        // console.log(error);
       });
     },
   },
@@ -416,14 +423,14 @@ const Login = Vue.component("login", {
         // .then((text)=> console.log(text))
         .then(function (jsonResponse) {
           // display a success message
-          console.log(jsonResponse);
+          // console.log(jsonResponse);
           // self.success = jsonResponse.success;
           // self.errors = jsonResponse.errors;
           if (jsonResponse.success != null) {
-            let localuserid = jsonResponse.success["0"].userid;
+            var userid = jsonResponse.success["0"].userid;
             let jwt_token = jsonResponse.success["0"].token;
             localStorage.setItem("token", jwt_token);
-            localStorage.setItem("userid", localuserid);
+            localStorage.setItem("userid", userid);
             console.info("Token generated and added to localStorage.");
             self.token = jwt_token;
             self.$router.push("/explore");
@@ -433,7 +440,7 @@ const Login = Vue.component("login", {
           }
         })
         .catch(function (error) {
-          console.log(error);
+          // console.log(error);
         });
     },
   },
@@ -489,7 +496,7 @@ const UserProfile = Vue.component("profile", {
                 <div class = "row">
                     <div class = "col-9 row">
                         <div class = "col-3 pr-3">
-                        <img :src="'../static/uploads/' + profilePic" alt="icon" height="180" width="200" class = "mb-3"> 
+                        <img :src="'/static/uploads/' + profilePic" alt="icon" height="180" width="200" class = "mb-3"> 
                         </div>
 
                         <div class = "col-8 pl-3 mt-3">
@@ -571,7 +578,7 @@ const UserProfile = Vue.component("profile", {
   created: function (userid) {
     let self = this;
     let uid = self.$route.params.userid;
-    console.log(self.$route.params.userid);
+    // console.log();
     fetch('/api/users/' + uid + '/posts', {
       method: "GET",
       headers: {
@@ -584,7 +591,7 @@ const UserProfile = Vue.component("profile", {
         return response.json();
       })
       .then(function (jsonResponse) {
-        console.log(jsonResponse);
+        // console.log(jsonResponse);
         self.userid = jsonResponse.response["0"].id;
         self.username = jsonResponse.response["0"].username;
         self.loctn = jsonResponse.response["0"].location;
@@ -594,9 +601,10 @@ const UserProfile = Vue.component("profile", {
         self.follNum = jsonResponse.response["0"].numfollower;
         self.profilePic = jsonResponse.response["0"].profile_photo;
         self.posts = jsonResponse.response["0"].posts;
+        
       })
       .catch(function (error) {
-        console.log(error);
+        // console.log(error);
       });
   },
   methods: {
@@ -712,7 +720,7 @@ const NewPost = Vue.component("new-post", {
           return response.json();
         })
         .then(function (jsonResponse) {
-          console.log(jsonResponse);
+          // console.log(jsonResponse);
           // add if statement
           self.$router.push('/explore')
           // self.
@@ -749,12 +757,24 @@ const router = new VueRouter({
 });
 
 // Instantiate our main Vue Instance
+// import Vue from 'vue';
+// import VueFlashMessage from '../src';
+// Vue.use(VueFlashMessage);
+{/* <projectRoot>/node_modules/@vue/cli-service/webpack.config.js */}
 let app = new Vue({
+  
   el: "#app",
   router,
   data: function () {
     return{ 
-      userid: '',
+        userid: localStorage.getItem('userid'),
     }
+  }, 
+  watch: {
+    $route() {
+      this.userid = localStorage.getItem('userid');
+     
+      
   }
+}
 });
