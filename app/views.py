@@ -91,7 +91,7 @@ def userposts(user_id):
                         'user_id': user_post.user_id,
                         'photo': user_post.photo,
                         'caption': user_post.caption,
-                      'created_on': user_post.created_on,
+                                 'created_on': user_post.created_on.strftime("%d %b %Y"),
                        'likes': 0})
 
         response = [{"id": user_id, 
@@ -102,7 +102,7 @@ def userposts(user_id):
                      "location": userdetail.location,
                      "biography": userdetail.bio,
                      "profile_photo": userdetail.proPhoto,
-                     "joined_on": userdetail.joined_on,
+                     "joined_on": userdetail.joined_on.strftime("%B %Y"),
                      "posts": post_results,
                      "numpost": total_posts,
                      "numfollower": follow,
@@ -162,7 +162,7 @@ def all_posts():
                                 'proPhoto': userinfo.proPhoto,
                                 'photo': post.photo,
                                 'caption': post.caption,
-                                'created_on': post.created_on,
+                                'created_on': post.created_on.strftime("%d %b %Y"),
                                 'likes': likes})
         
         
@@ -193,7 +193,7 @@ def register():
     form = RegisterForm()
     if request.method == "POST" and form.validate_on_submit():
     
-        # print('here')
+        
         username = form.username.data
         password = form.password.data
         first_name = form.first_name.data
@@ -228,11 +228,11 @@ def register():
             db.session.add(user)
             db.session.commit()
                                     
-        return jsonify(success =[{'message': 'Successfully registered'}])
+            return jsonify(success =[{'message': 'Successfully registered'}])
+        return jsonify(response = [{'message': 'Form not validated'}])
     else: 
         error_list = form_errors(form)
-        error = [{'errors': error_list}]
-        return  jsonify(errors = error)
+        return jsonify(errors=[{'errors': error_list}])
 
 
 

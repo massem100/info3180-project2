@@ -27,6 +27,7 @@ Vue.component("app-header", {
     `,
   data: function () {
     return {
+      userid: ''
       
       
     };
@@ -81,23 +82,7 @@ const Home = Vue.component("home", {
 const Explore = Vue.component("explore", {
   template: `
       <div class="container">
-        <div> 
-
-  
                 
-        <ul v-for = "error in errors" class="list alert alert-danger d-flex flex-column"> 
-            <li class = "ml-3" > 
-                  {{error.errors[0]}} 
-            </li>
-                                        
-            <li class = "ml-3">
-                    {{error.errors[1]}}    
-               
-            </li>
-
-        </ul> 
-      </div>
-        
           <div class="row explore-card">
             <div class="col-md-9">
               <div class="card explore-card-btm mb-3  explore-card-group" v-for= "post in posts" >
@@ -217,6 +202,8 @@ const Explore = Vue.component("explore", {
       .then(function (jsonResponse) {
         // console.log(jsonResponse);
         self.posts = jsonResponse.response["0"].posts;
+        // console.log(self.posts = jsonResponse.response["0"].posts);
+        
         self.errors = jsonResponse.errors;
       })
       .catch(function (error) {
@@ -239,20 +226,17 @@ const NotFound = Vue.component("not-found", {
 const Register = Vue.component("register", {
   template: `
       <div class = "d-flex flex-column align-items-center">
-            <h4 class = "font-weight-bold "> Register </h4>
-            <div class = "m-2"> 
-                <ul v-for= "data in success" class="list alert alert-success"> 
-                        {{message}}                        
-                </ul>
-                
-                <ul v-for = "error in error_list" class="list alert alert-danger d-flex flex-column"> 
-                    <li class = "ml-3" > 
-                        {{error}} 
-                    </li>
-                                                
-                    
-                </ul> 
-                </div>
+        <h4 class = "font-weight-bold "> Register </h4>
+        <div v-if = "error_list"> 
+
+              <ul v-for="error in error_list" class="alert alert-danger "> 
+                  <li class = "ml-3"> 
+                        {{error}}
+                  </li>
+
+              </ul> 
+          </div>
+            
             <div class = "card w-50 h-60 d-flex flex-column m-2 border rounded">
                 
                 <form class="form-group m-4 p-2 " @submit.prevent="registerInfo" method='POST' id="RegisterForm" enctype ="multipart/form-data">
@@ -323,7 +307,6 @@ const Register = Vue.component("register", {
         `,
   data: function () {
     return {
-      success: [],
       error_list: [],
     };
   },
@@ -341,17 +324,19 @@ const Register = Vue.component("register", {
         credentials: "same-origin",
       })
       .then(function (response) {
-        return response.json();
+          return response.json();
       })
       .then(function (jsonResponse) {
         // display a success message
-        // console.log(jsonResponse);
-        if (jsonResponse.success["0"].message == "Successfully registered") {
-          self.success = jsonResponse.success;
-          self.error_list = jsonResponse.errors["0"];
-          self.$router.push('/login');
-        }
-        })
+            // console.log(jsonResponse);
+            if (jsonResponse.success[0].message == "Successfully registered") {
+                self.$router.push('/login');
+            }else{
+                self.error_list = jsonResponse.errors;
+                // console.log(error_list);
+                
+            }
+      })
       .catch(function (error) {
         // console.log(error);
       });
@@ -477,9 +462,7 @@ const Logout = Vue.component("logout", {
         //console.log(jsonResponse);
           localStorage.removeItem("userid");
           localStorage.removeItem("token");          
-          let message = "You have been logged out ";
-          let logout = document.getElementById("Logout");
-          // logout.classList.add("hide-display");
+        //   let logout = document.getElementById("Logout");
           self.$router.push('/');
 
       })
