@@ -13,8 +13,8 @@ Vue.component("app-header", {
           <li class="nav-item active">
             <router-link class="nav-link" to="/">Home <span class="sr-only">(current)</span></router-link>
           </li>
-          <li class="nav-item active">
-            <router-link v-if = "$root.userid" class="nav-link" to="/explore">Explore<span class="sr-only">(current)</span></router-link>
+          <li v-if = "$root.userid" class=" nav-item active">
+            <router-link  class="nav-link" to="/explore">Explore<span class="sr-only">(current)</span></router-link>
           </li>
           <li class="nav-item active">
             <router-link class="nav-link" v-if = "$root.userid" :to="{ name: 'UserProfile', params: { userid: $root.userid }}"> My Profile <span class="sr-only">(current)</span></router-link>
@@ -133,7 +133,7 @@ const Explore = Vue.component("explore", {
                       </div>
 
                       <!-place username here-->
-                      <p class="explore-card-username" ><a  @click="get_profile(post.user_id)" ><strong>{{post.username}}</strong></a></p>
+                      <p class="explore-card-username" ><a  @get-user = "get_UserInfo(post.user_id)" @click="get_profile(post.user_id)" ><strong>{{post.username}}</strong></a></p>
                   </div>
                   <img :src=" '/static/uploads/' + post.photo" class="card-img-top explore-card-postimg" alt="..." >
 
@@ -177,6 +177,32 @@ const Explore = Vue.component("explore", {
     };
   },
   methods: {
+
+    get_UserInfo: function (user_id){
+
+      fetch("/api/users/" + user_id + "/posts/username", {
+        method: "GET",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("token"),
+          "X-CSRFToken": token,
+        },
+        credentials: "same-origin",
+      })
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (jsonResponse) {
+          console.log(jsonResponse);
+          // self.posts = jsonResponse.response["0"].posts;
+          // console.log(self.posts = jsonResponse.response["0"].posts);
+
+          self.errors = jsonResponse.errors;
+        })
+        .catch(function (error) {
+          // console.log(error);
+        });
+
+    },
     get_profile: function (link_user) {
       let self = this;
       userid = "" +  link_user;
@@ -247,6 +273,9 @@ const Explore = Vue.component("explore", {
       .catch(function (error) {
         // console.log(error);
       });
+
+    this.emit("get-user", user_id);
+      
   },
 });
 
@@ -632,7 +661,6 @@ const UserProfile = Vue.component("profile", {
         self.follNum = jsonResponse.response["0"].numfollower;
         self.profilePic = jsonResponse.response["0"].profile_photo;
         self.posts = jsonResponse.response["0"].posts;
-        
       })
       .catch(function (error) {
         // console.log(error);
@@ -662,6 +690,7 @@ const UserProfile = Vue.component("profile", {
         .then(function (jsonResponse) {
           // display a success message
           // console.log(jsonResponse);
+          
           if (jsonResponse.response["0"].message == "You are now following that user."){
             
             let f_button = document.getElementById('Follow');
@@ -669,9 +698,9 @@ const UserProfile = Vue.component("profile", {
             f_button.classList.remove('btn-primary');
             f_button.classList.add('green');
             f_button.classList.add('text-white');
-            let new_follow = document.getElementById(Follow_num).textContent = jsonResponse.response["0"].followers;
+            document.getElementById(Follow_num).textContent = jsonResponse.response["0"].followers;
           }else{
-            let f_btn = document.getElementById('follow').innerHTML = jsonResponse.response['0'].followers;
+            document.getElementById('follow').innerHTML = jsonResponse.response['0'].followers;
             
              }
         
