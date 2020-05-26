@@ -14,7 +14,7 @@ Vue.component("app-header", {
             <router-link class="nav-link" to="/">Home <span class="sr-only">(current)</span></router-link>
           </li>
           <li class="nav-item active">
-            <router-link class="nav-link" to="/explore">Explore<span class="sr-only">(current)</span></router-link>
+            <router-link v-if = "$root.userid" class="nav-link" to="/explore">Explore<span class="sr-only">(current)</span></router-link>
           </li>
           <li class="nav-item active">
             <router-link class="nav-link" v-if = "$root.userid" :to="{ name: 'UserProfile', params: { userid: $root.userid }}"> My Profile <span class="sr-only">(current)</span></router-link>
