@@ -12,9 +12,9 @@ class RegisterForm(FlaskForm):
     first_name = StringField('first Name', validators=[InputRequired('First name field should not be empty')])
     last_name = StringField('password', validators=[InputRequired('Last Name field should not be empty')])
     email = EmailField('Email', validators = [InputRequired('Email Field should not be  empty'), Email()])
-    location = StringField('location', validators=[InputRequired('Add location')])
-    biography = TextAreaField('biography', validators=[InputRequired('Add a bio')])
-    photo = FileField ('photo', validators=[FileAllowed(['jpg','jpeg','png'], 'Images only!')])
+    location = StringField('location', validators=[InputRequired('No Location was provided')])
+    biography = TextAreaField('biography', validators=[InputRequired('Biography field must not be empty')])
+    photo = FileField ('photo', validators=[InputRequired('An image must be uploaded'), FileAllowed(['jpg','jpeg','png'], 'Images only!')])
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired('A username is required')])

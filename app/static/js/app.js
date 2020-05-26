@@ -1,4 +1,5 @@
 /* Add your Application JavaScript */
+Vue.prototype.$bus = new Vue(); // Global event bus
 Vue.component("app-header", {
   template: `
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
@@ -16,10 +17,14 @@ Vue.component("app-header", {
             <router-link class="nav-link" to="/explore">Explore<span class="sr-only">(current)</span></router-link>
           </li>
           <li class="nav-item active">
-            <router-link class="nav-link" :to="{ name: 'UserProfile', params: { userid:$root.userid }}"> My Profile <span class="sr-only">(current)</span></router-link>
+            <router-link class="nav-link" v-if = "$root.userid" :to="{ name: 'UserProfile', params: { userid: $root.userid }}"> My Profile <span class="sr-only">(current)</span></router-link>
           </li>
-          <li class="nav-item active">
+
+          <li v-if= "$root.userid" class="nav-item active">
             <router-link id = "Logout" class="nav-link" to="/logout">Logout<span class="sr-only">(current)</span></router-link>
+          </li>
+          <li v-else class="nav-item active">
+            <router-link id = "Login" class="nav-link" to="/login">Login<span class="sr-only">(current)</span></router-link>
           </li>
         </ul>
       </div>
@@ -27,11 +32,35 @@ Vue.component("app-header", {
     `,
   data: function () {
     return {
-      userid: ''
-      
+      isAuthenticated: this.checkisAuthenticated(),
       
     };
   },
+  created() {
+    this.$bus.$on('logged', ()=> {
+      this.isAuthenticated = this.checkisAuthenticated();
+      console.log('here');
+    })
+  },
+  methods: {
+    checkisAuthenticated() {
+      let token = localStorage.getItem('token');
+      if (token) {
+        return true
+      } else {
+        return false
+      }
+    }
+  }, 
+  watch :{
+    isAuthenticated() {
+      this.isAuthenticated = this.checkisAuthenticated();
+    }, 
+    
+    token() {
+      this.token = localStorage.getItem('token');
+    }
+  }
   
 });
 
@@ -44,6 +73,15 @@ Vue.component("app-footer", {
     </footer>
     `,
 });
+
+Vue.component('alert-box', {
+  template: `
+    <div class="alert alert-danger h-25">
+      <strong>Error!</strong>
+      <slot></slot>
+    </div>
+  `
+})
 
 const Home = Vue.component("home", {
   template: `
@@ -226,17 +264,19 @@ const NotFound = Vue.component("not-found", {
 const Register = Vue.component("register", {
   template: `
       <div class = "d-flex flex-column align-items-center">
-        <h4 class = "font-weight-bold "> Register </h4>
-        <div v-if = "error_list"> 
+        
+        <alert-box v-on:focus.native="scrollBehaviour" v-if = "error_list != '' "> 
+          
+          <ul id = "alert_box" v-for= "error in error_list">
+            <li>
+              {{error}}
+            </li>
+          </ul>
+          
+        </alert-box>
+        
+            <h4 class = "font-weight-bold "> Register </h4>
 
-              <ul v-for="error in error_list" class="alert alert-danger "> 
-                  <li class = "ml-3"> 
-                        {{error}}
-                  </li>
-
-              </ul> 
-          </div>
-            
             <div class = "card w-50 h-60 d-flex flex-column m-2 border rounded">
                 
                 <form class="form-group m-4 p-2 " @submit.prevent="registerInfo" method='POST' id="RegisterForm" enctype ="multipart/form-data">
@@ -307,8 +347,8 @@ const Register = Vue.component("register", {
         `,
   data: function () {
     return {
-      error_list: [],
-    };
+      error_list: []
+    }
   },
   methods: {
     registerInfo: function () {
@@ -328,19 +368,25 @@ const Register = Vue.component("register", {
       })
       .then(function (jsonResponse) {
         // display a success message
-            // console.log(jsonResponse);
-            if (jsonResponse.success[0].message == "Successfully registered") {
-                self.$router.push('/login');
-            }else{
-                self.error_list = jsonResponse.errors;
-                // console.log(error_list);
-                
-            }
+        console.log(jsonResponse);
+        self.error_list = jsonResponse.errors;
+        // console.log(error_list);
+        // alert(error_list);
+        if (jsonResponse.success[0].message == "Successfully registered") {
+            self.$router.push('/login');
+        } 
       })
       .catch(function (error) {
         // console.log(error);
       });
     },
+  },
+  watch: {
+    
+    error_list: function (){
+      window.scroll(0,0);
+    }
+
   },
 });
 
@@ -367,7 +413,7 @@ const Login = Vue.component("login", {
                                 placeholder="Enter Password" >
                     </div>                             
                     <div class=" d-flex justify-content-center mb-2 p-2">
-                            <button class="btn btn-lg btn-green text-white font-weight-bold" v-if = "isAuthenticated" type="submit"><i
+                            <button class="btn btn-lg btn-green text-white font-weight-bold" type="submit"><i
                                     class="glyphicon glyphicon-ok-sign"></i> Login </button>
                        
                     </div>
@@ -386,7 +432,7 @@ const Login = Vue.component("login", {
     return {
       success: [],
       errors: [],
-      isAuthenticated: true,
+    
     };
   },
   methods: {
@@ -419,7 +465,7 @@ const Login = Vue.component("login", {
             console.info("Token generated and added to localStorage.");
             self.token = jwt_token;
             self.$router.push("/explore");
-            msg = "Login successful";
+            this.$bus.$emit('logged', 'User logged')
           } else {
             self.msg = jsonResponse.errors["0"];
           }
@@ -462,8 +508,10 @@ const Logout = Vue.component("logout", {
         //console.log(jsonResponse);
           localStorage.removeItem("userid");
           localStorage.removeItem("token");          
-        //   let logout = document.getElementById("Logout");
+          // let logout = document.getElementById("Logout");
+          // logout.classList.add('hide-display');
           self.$router.push('/');
+          // self.isAuthenticated =false;
 
       })
       .catch(function (error) {
@@ -756,8 +804,9 @@ let app = new Vue({
   watch: {
     $route() {
       this.userid = localStorage.getItem('userid');
-     
-      
-  }
+    
+    
+    },
+    
 }
 });

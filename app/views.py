@@ -74,7 +74,7 @@ def userposts(user_id):
             db.session.commit()
             return jsonify(response=[{"message": "Successfully created a new post"}])
         else:
-            return jsonify(errors=[{"errors": form_errors(form)}])
+            return jsonify(errors={"errors": form_errors(form)})
 
     if request.method == 'GET':
         post_results = []
@@ -109,7 +109,7 @@ def userposts(user_id):
                      "follower": followers_list}]
         return jsonify( response = response)
     else:
-        return jsonify(error=[{"errors": "Connection not achieved"}])
+        return jsonify(error={"errors": "Connection not achieved"})
     
 
 
@@ -138,7 +138,7 @@ def follow(user_id):
             follow_total = len(Follow.query.filter_by(user_id=target_user).all())
             return jsonify(response=[{"message": "You are already following that user.", "followers": follow_total}])
     else:
-        return jsonify(errors=[{'error': 'Connection not achieved'}])
+        return jsonify(errors={'error': 'Connection not achieved'})
 
     
 
@@ -167,7 +167,7 @@ def all_posts():
         
         
         return jsonify (response=[{'posts': post_list}])
-    return jsonify (errors=[{'error': 'No Connection '}])
+    return jsonify (errors={'error': 'No Connection '})
 
 @app.route('/api/posts/<post_id>/like', methods = ['POST'])
 @requires_auth
@@ -185,7 +185,7 @@ def likes(post_id):
         total = len(Like.query.filter_by(post_id=postid).all())
         return jsonify(response=[{'message': 'Post liked!', 'likes': total}])
     else:
-        return jsonify(error=[{'error': 'Connection not achieved'}])
+        return jsonify(error={'error': 'Connection not achieved'})
 
     
 @app.route('/api/users/register', methods=["POST"])
@@ -229,10 +229,9 @@ def register():
             db.session.commit()
                                     
             return jsonify(success =[{'message': 'Successfully registered'}])
-        return jsonify(response = [{'message': 'Form not validated'}])
     else: 
         error_list = form_errors(form)
-        return jsonify(errors=[{'errors': error_list}])
+        return jsonify(errors= error_list)
 
 
 
@@ -257,11 +256,11 @@ def login():
                 token = jwt.encode(payload, jwt_token, algorithm='HS256').decode('utf-8')
                 # data = {'token': token}, message = "Token Generated"
                 return jsonify(success = [{"token": token,"userid": user.id, "message": "User successfully logged in."}])
-            return jsonify(errors = [{"errors": "Password not a match"}])
-        return jsonify(errors=[{"errors": "Username already exists "}])  
+            return jsonify(errors = {"errors": "Password not a match"})
+        return jsonify(errors={"errors": "Username already exists "})  
     else:
         error_list = form_errors(form)
-        return jsonify(errors=[{'errors': error_list}])
+        return jsonify(errors = error_list)
 
 
 
