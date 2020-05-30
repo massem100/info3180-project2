@@ -178,31 +178,6 @@ const Explore = Vue.component("explore", {
   },
   methods: {
 
-    get_UserInfo: function (user_id){
-
-      fetch("/api/users/" + user_id + "/posts/username", {
-        method: "GET",
-        headers: {
-          "Authorization": "Bearer " + localStorage.getItem("token"),
-          "X-CSRFToken": token,
-        },
-        credentials: "same-origin",
-      })
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (jsonResponse) {
-          console.log(jsonResponse);
-          // self.posts = jsonResponse.response["0"].posts;
-          // console.log(self.posts = jsonResponse.response["0"].posts);
-
-          self.errors = jsonResponse.errors;
-        })
-        .catch(function (error) {
-          // console.log(error);
-        });
-
-    },
     get_profile: function (link_user) {
       let self = this;
       userid = "" +  link_user;
@@ -537,11 +512,8 @@ const Logout = Vue.component("logout", {
         //console.log(jsonResponse);
           localStorage.removeItem("userid");
           localStorage.removeItem("token");          
-          // let logout = document.getElementById("Logout");
-          // logout.classList.add('hide-display');
           self.$router.push('/');
-          // self.isAuthenticated =false;
-
+          
       })
       .catch(function (error) {
         // console.log(error);

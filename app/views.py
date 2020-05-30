@@ -52,14 +52,6 @@ def requires_auth(f):
 
   return decorated     
 
-@app.route('/api/users/<user_id>/posts/username')
-@requires_auth
-def getusername(user_id):
-    userdetail = User.query.filter_by(id=user_id).first()
-    username = userdetail.username
-    print("workingggggg")
-    return jsonify(username = {'username': username})
-
 
 
 @app.route('/api/users/<user_id>/posts', methods=["POST", "GET"])
