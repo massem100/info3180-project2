@@ -7,7 +7,7 @@ This file creates your application.
 import os 
 import base64
 from app import app, db, login_manager, jwt_token
-from flask import render_template, request, jsonify, flash, session, _request_ctx_stack,g
+from flask import render_template, request, jsonify, flash, session, _request_ctx_stack, g
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import current_user, logout_user, login_user, login_required
@@ -60,7 +60,7 @@ def requires_auth(f):
 def userposts(user_id):
     form = PostForm()
     id = user_id
-    # print(id)
+    
     
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -73,9 +73,9 @@ def userposts(user_id):
             new_post = Post(int(id), secure_file, caption)
             db.session.add(new_post)
             db.session.commit()
-            return jsonify(response=[{"message": "Successfully created a new post"}])
+            return jsonify(response={"message": "Successfully created a new post", "type":"success"})
         else:
-            return jsonify(errors={"errors": form_errors(form)})
+            return jsonify(response={"message": "Post upload unsuccessful, check file format or add a caption ","type":"error"})
 
     if request.method == 'GET':
         post_results = []
@@ -84,7 +84,7 @@ def userposts(user_id):
         user_posts = db.session.query(Post).filter_by(user_id=id).all()
         total_posts = len(user_posts)
         followers = Follow.query.filter_by(user_id=id).all()
-        follow = len(followers)
+        follow_total = len(followers)
         for follower in followers:
             followers_list.append(follower.user_id)
         for user_post in user_posts:
@@ -92,7 +92,7 @@ def userposts(user_id):
                         'user_id': user_post.user_id,
                         'photo': user_post.photo,
                         'caption': user_post.caption,
-                                 'created_on': user_post.created_on.strftime("%d %b %Y"),
+                        'created_on': user_post.created_on.strftime("%d %b %Y"),
                        'likes': 0})
 
         response = [{"id": user_id, 
@@ -106,9 +106,9 @@ def userposts(user_id):
                      "joined_on": userdetail.joined_on.strftime("%B %Y"),
                      "posts": post_results,
                      "numpost": total_posts,
-                     "numfollower": follow,
+                     "numfollower": follow_total,
                      "follower": followers_list}]
-        return jsonify( response = response)
+        return jsonify(response = response)
     else:
         return jsonify(error={"errors": "Connection not achieved"})
     
@@ -132,12 +132,12 @@ def follow(user_id):
             db.session.add(follow)
             db.session.commit()
 
-            user = User.query.filter_by(id=target_user).first()
+            # user = User.query.filter_by(id=target_user).first()
             follow_total = len(Follow.query.filter_by(user_id=target_user).all())
-            return jsonify(response=[{"message": "You are now following that user." , "followers": follow_total}])
+            return jsonify(response={"message": "You are now following that user." , "followers": follow_total})
         else:
             follow_total = len(Follow.query.filter_by(user_id=target_user).all())
-            return jsonify(response=[{"message": "You are already following that user.", "followers": follow_total}])
+            return jsonify(response={"message": "You are already following that user.", "followers": follow_total})
     else:
         return jsonify(errors={'error': 'Connection not achieved'})
 
@@ -153,7 +153,7 @@ def all_posts():
         post_list = []
         
         user_posts = Post.query.order_by(desc(Post.created_on)).all()
-        # print(user_posts)
+        
         for post in user_posts:
             userinfo = User.query.filter_by(id=post.user_id).first()
             likes = len(Like.query.filter_by(post_id=post.id).all())
@@ -179,7 +179,7 @@ def likes(post_id):
         postid = int(request.form['post_id'])
 
         get_likes = Like.query.filter_by(post_id=postid, user_id =user_id).all()
-        # print(get_likes)
+        
         like = Like(user_id, postid)
         db.session.add(like)
         db.session.commit()
@@ -250,12 +250,9 @@ def login():
             if check_password_hash(user.password, password):
                 # get user id, load into session
                 login_user(user)
-                # remember to flash a message to the user
-                # flash('You have been logged in successfully.', 'success')
-                # print(user.id)
+                
                 payload = {'userid': user.id}
                 token = jwt.encode(payload, jwt_token, algorithm='HS256').decode('utf-8')
-                # data = {'token': token}, message = "Token Generated"
                 return jsonify(success = [{"token": token,"userid": user.id, "message": "User successfully logged in."}])
             return jsonify(errors = {"errors": "Password not a match"})
         return jsonify(errors={"errors": "Username already exists "})  

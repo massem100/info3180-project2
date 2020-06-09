@@ -76,8 +76,7 @@ Vue.component("app-footer", {
 
 Vue.component('alert-box', {
   template: `
-    <div class="alert alert-danger h-25">
-      <strong>Error!</strong>
+    <div class="alert  h-25">
       <slot></slot>
     </div>
   `
@@ -133,7 +132,7 @@ const Explore = Vue.component("explore", {
                       </div>
 
                       <!-place username here-->
-                      <p class="explore-card-username" ><a  @get-user = "get_UserInfo(post.user_id)" @click="get_profile(post.user_id)" ><strong>{{post.username}}</strong></a></p>
+                      <p class="explore-card-username" ><a  @click="get_profile(post.user_id)" ><strong>{{post.username}}</strong></a></p>
                   </div>
                   <img :src=" '/static/uploads/' + post.photo" class="card-img-top explore-card-postimg" alt="..." >
 
@@ -247,10 +246,7 @@ const Explore = Vue.component("explore", {
       })
       .catch(function (error) {
         // console.log(error);
-      });
-
-    this.emit("get-user", user_id);
-      
+      });    
   },
 });
 
@@ -269,7 +265,7 @@ const Register = Vue.component("register", {
   template: `
       <div class = "d-flex flex-column align-items-center">
         
-        <alert-box v-on:focus.native="scrollBehaviour" v-if = "error_list != '' "> 
+        <alert-box class ="alert alert-danger" v-on:focus.native="scrollBehaviour" v-if = "error_list != '' "> 
           
           <ul id = "alert_box" v-for= "error in error_list">
             <li>
@@ -469,7 +465,7 @@ const Login = Vue.component("login", {
             console.info("Token generated and added to localStorage.");
             self.token = jwt_token;
             self.$router.push("/explore");
-            this.$bus.$emit('logged', 'User logged')
+            this.$bus.$emit('logged', 'User logged');
           } else {
             self.msg = jsonResponse.errors["0"];
           }
@@ -513,6 +509,7 @@ const Logout = Vue.component("logout", {
           localStorage.removeItem("userid");
           localStorage.removeItem("token");          
           self.$router.push('/');
+          console.info("Token removed from localStorage.");
           
       })
       .catch(function (error) {
@@ -524,7 +521,13 @@ const Logout = Vue.component("logout", {
 const UserProfile = Vue.component("profile", {
   template: `
         <div>
+          <alert-box class = "alert alert-info " v-if = "message">
+
+          {{message}}
+
+          </alert-box>
             <div class = "shadow p-3 mb-5 bg-white rounded">
+            
                 <div class = "row">
                     <div class = "col-9 row">
                         <div class = "col-3 pr-3">
@@ -604,6 +607,7 @@ const UserProfile = Vue.component("profile", {
       follNum: 0,
       profilePic: '',
       posts: [],
+      message:'',
     };
   },
   
@@ -661,20 +665,17 @@ const UserProfile = Vue.component("profile", {
         })
         .then(function (jsonResponse) {
           // display a success message
-          // console.log(jsonResponse);
+          console.log(jsonResponse);
           
-          if (jsonResponse.response["0"].message == "You are now following that user."){
+          
             
             let f_button = document.getElementById('Follow');
             f_button.innerText ="Following";
             f_button.classList.remove('btn-primary');
-            f_button.classList.add('green');
+            f_button.classList.add('btn-success');
             f_button.classList.add('text-white');
-            document.getElementById(Follow_num).textContent = jsonResponse.response["0"].followers;
-          }else{
-            document.getElementById('follow').innerHTML = jsonResponse.response['0'].followers;
-            
-             }
+            document.getElementById('Follow_num').innerText = jsonResponse.response.followers;
+            self.message =jsonResponse.response.message;
         
           
         })
@@ -689,6 +690,15 @@ const NewPost = Vue.component("new-post", {
   template: `
         <div> 
           <div class = "d-flex flex-column align-items-center nw-post-container">
+        <alert-box id = "message-box" :class="{'alert alert-danger': response.type === 'error',
+          'alert alert-success': response.type === 'success'
+        }" v-on:focus.native="scrollBehaviour" v-if = "response" > 
+          
+          {{response.message}}
+          
+        </alert-box>
+        
+        
             <div class="nw-post-title"> 
               <h4><strong> New Post</strong> </h4>
             </div>
@@ -728,6 +738,7 @@ const NewPost = Vue.component("new-post", {
   data: function () {
     return {
       id: localStorage.getItem('userid'),
+      response:'',
       
       
     };
@@ -752,11 +763,21 @@ const NewPost = Vue.component("new-post", {
           return response.json();
         })
         .then(function (jsonResponse) {
-          // console.log(jsonResponse);
+          console.log(jsonResponse);
           // add if statement
-          self.$router.push('/explore')
-          // self.
+          
+            self.response = jsonResponse.response;
+
+            if (jsonResponse.response.type === 'success'){
+              setTimeout(function(){ self.$router.push('/explore');}, 2000);
+
+            }
+                          
+
         })
+        .catch(function (error) {
+          console.log(error);
+        });
       },
     },
      
@@ -789,10 +810,6 @@ const router = new VueRouter({
 });
 
 // Instantiate our main Vue Instance
-// import Vue from 'vue';
-// import VueFlashMessage from '../src';
-// Vue.use(VueFlashMessage);
-{/* <projectRoot>/node_modules/@vue/cli-service/webpack.config.js */}
 let app = new Vue({
   
   el: "#app",
