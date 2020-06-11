@@ -530,16 +530,13 @@ const UserProfile = Vue.component("profile", {
             
                 <div class = "row">
                     <div class = "col-9 row">
-                        <div class = "col-3 pr-3 mr-2 ">
+                        <div class = "col-3 pr-3">
                         <img :src="'/static/uploads/' + profilePic" alt="icon" height="180" width="200" class = "mb-3"> 
                         </div>
 
                         <div class = "col-8 pl-3 mt-3">
                             <div class = "user-name">
-                                {{name}}
-                            </div>
-                            <div class = "">
-                                @{{username}}
+                                {{username}}
                             </div>
 
                             <div class = "location mt-3">
@@ -588,9 +585,8 @@ const UserProfile = Vue.component("profile", {
             </div>
           
             <div class = "row">
-                <div v-for="post in posts" class = "col-md-4">
-                    <img :src="'/static/uploads/' + post.photo" height="350" width="350" class = "m-2"> 
-                    
+                <div v-for="post in posts" class = "col-4">
+                    <img :src="'/static/uploads/' + post.photo" height="350" width="350" class = ""> 
                 </div>
 
 
@@ -604,7 +600,6 @@ const UserProfile = Vue.component("profile", {
       userid: '',
       user_details: [],
       username: '',
-      name:'',
       loctn: '',
       membership: '',
       biography: '',
@@ -635,7 +630,6 @@ const UserProfile = Vue.component("profile", {
         // console.log(jsonResponse);
         self.userid = jsonResponse.response["0"].id;
         self.username = jsonResponse.response["0"].username;
-        self.name = jsonResponse.response["0"].firstname +" "+ jsonResponse.response["0"].lastname;
         self.loctn = jsonResponse.response["0"].location;
         self.membership = jsonResponse.response["0"].joined_on;
         self.biography = jsonResponse.response["0"].biography;
