@@ -241,8 +241,7 @@ const Explore = Vue.component("explore", {
         // console.log(jsonResponse);
         self.posts = jsonResponse.response["0"].posts;
         // console.log(self.posts = jsonResponse.response["0"].posts);
-        
-        self.errors = jsonResponse.errors;
+        // self.errors = jsonResponse.errors;
       })
       .catch(function (error) {
         // console.log(error);
@@ -506,10 +505,13 @@ const Logout = Vue.component("logout", {
       .then(function (jsonResponse) {
         // display a success message
         //console.log(jsonResponse);
+        if (localStorage.getItem("token") != null) {
           localStorage.removeItem("userid");
-          localStorage.removeItem("token");          
+          localStorage.removeItem("token");
           self.$router.push('/');
-          console.info("Token removed from localStorage.");
+        } else {
+          self.$router.push('/');
+        }
           
       })
       .catch(function (error) {
