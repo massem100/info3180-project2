@@ -87,3 +87,4 @@ class Follow(UserMixin,db.Model):
     def __init__(self, user_id,follower_id):
        self.user_id = user_id
        self.follower_id = follower_id
+

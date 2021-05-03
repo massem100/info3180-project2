@@ -6,7 +6,7 @@ This file creates your application.
 """
 import os 
 import base64
-from app import app, db, login_manager, jwt_token
+from app import app, db, login_manager, jwt_token, csrf, cors
 from flask import render_template, request, jsonify, flash, session, _request_ctx_stack, g
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -338,4 +338,4 @@ def page_not_found(error):
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0", port="8080")
+    app.run(debug=True, host="0.0.0.0", port="5000")
