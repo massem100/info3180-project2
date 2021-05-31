@@ -65,7 +65,7 @@ def userposts(user_id):
     if request.method == 'POST':
         if form.validate_on_submit():
             photo = form.photo.data
-            caption = form.caption.data
+            caption = form.caption.data 
 
             secure_file = secure_filename(photo.filename)
             photo.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_file))
